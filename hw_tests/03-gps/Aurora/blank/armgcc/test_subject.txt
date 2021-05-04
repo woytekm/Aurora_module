@@ -1,0 +1,1 @@
+=== This test checks if we can enable GPS module, restet it, and receive NMEA feed from module. It can also test GPS fix, but Aurora needs to be outdoors for this to work.

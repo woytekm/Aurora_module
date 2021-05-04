@@ -1,0 +1,1 @@
+=== This test checks if ADC pin connected to battery voltage resistor divider works properly. RTT screen should provide measured ADC samples.
