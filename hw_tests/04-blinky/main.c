@@ -115,7 +115,7 @@ while(1)
     nrf_gpio_pin_write(MYLED6, 1);
     nrf_gpio_pin_write(MYLED7, 1);
 
-    nrf_delay_us(70000);
+    nrf_delay_us(90000);
     //nrf_gpio_pin_clear(BUZZER);
     nrf_gpio_pin_write(MYLED1, 0);
     nrf_gpio_pin_write(MYLED2, 0);
@@ -124,7 +124,26 @@ while(1)
     nrf_gpio_pin_write(MYLED5, 0);
     nrf_gpio_pin_write(MYLED6, 0);
     nrf_gpio_pin_write(MYLED7, 0);
-    nrf_delay_us(70000);
+    nrf_delay_us(90000);
+
+    nrf_gpio_pin_write(MYLED1, 1);
+    nrf_gpio_pin_write(MYLED2, 1);
+    nrf_gpio_pin_write(MYLED3, 1);
+    nrf_gpio_pin_write(MYLED4, 1);
+    nrf_gpio_pin_write(MYLED5, 1);
+    nrf_gpio_pin_write(MYLED6, 1);
+    nrf_gpio_pin_write(MYLED7, 1);
+    nrf_delay_us(90000);
+
+    nrf_gpio_pin_write(MYLED1, 0);
+    nrf_gpio_pin_write(MYLED2, 0);
+    nrf_gpio_pin_write(MYLED3, 0);
+    nrf_gpio_pin_write(MYLED4, 0);
+    nrf_gpio_pin_write(MYLED5, 0);
+    nrf_gpio_pin_write(MYLED6, 0);
+    nrf_gpio_pin_write(MYLED7, 0);
+
+    nrf_delay_us(440000);
 
   }
 
