@@ -1,4 +1,4 @@
-<img src="https://github.com/woytekm/Aurora_module/blob/main/applications/BLS2-rear/bls2_rear_prototype_v3.jpg" width="200" height="400">
+<img src="https://github.com/woytekm/Aurora_module/blob/main/applications/BLS2-rear/bls2_rear_prototype_v3.jpg" width="640" height="480">
 
 Goal of this project is to design and build waterproof, daylight visible, intelligent (IoT), bike tail light for road rides. I got fed up with various tail light 
 products which easily break, drain battery too fast, or leak and stop working after few rainy rides, despite being advertised as waterproof, so i decided to 
