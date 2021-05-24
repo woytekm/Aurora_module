@@ -118,8 +118,68 @@ void twi_init (void)
 #define MPR121_REG_RELEASE_THRESHOLD_BASE 0x42
 #define MPR121_REG_TOUCH_STATUS_BANK_0 0x0
 #define MPR121_REG_TOUCH_STATUS_BANK_1 0x1
+#define MPR121_REG_SRST 0x80
+#define MPR121_REG_DEBOUNCE 0x5B
 
-#define MPR121_CTRL_ALL_PADS_ON_FULL_BASELINE 207
+#define MPR121_CTRL_ALL_PADS_ON_10BIT_BASELINE 207
+#define MPR121_CTRL_ALL_PADS_ON_5BIT_BASELINE 143
+#define MPR121_CTRL_ALL_PADS_ON_NO_BASELINE 79
+#define MPR121_CTRL_SRST 0x63
+
+
+
+
+#define MHD_R	0x2B
+#define NHD_R	0x2C
+#define	NCL_R 	0x2D
+#define	FDL_R	0x2E
+#define	MHD_F	0x2F
+#define	NHD_F	0x30
+#define	NCL_F	0x31
+#define	FDL_F	0x32
+#define	ELE0_T	0x41
+#define	ELE0_R	0x42
+#define	ELE1_T	0x43
+#define	ELE1_R	0x44
+#define	ELE2_T	0x45
+#define	ELE2_R	0x46
+#define	ELE3_T	0x47
+#define	ELE3_R	0x48
+#define	ELE4_T	0x49
+#define	ELE4_R	0x4A
+#define	ELE5_T	0x4B
+#define	ELE5_R	0x4C
+#define	ELE6_T	0x4D
+#define	ELE6_R	0x4E
+#define	ELE7_T	0x4F
+#define	ELE7_R	0x50
+#define	ELE8_T	0x51
+#define	ELE8_R	0x52
+#define	ELE9_T	0x53
+#define	ELE9_R	0x54
+#define	ELE10_T	0x55
+#define	ELE10_R	0x56
+#define	ELE11_T	0x57
+#define	ELE11_R	0x58
+#define	FIL_CFG	0x5D
+#define	ELE_CFG	0x5E
+#define GPIO_CTRL0	0x73
+#define	GPIO_CTRL1	0x74
+#define GPIO_DATA	0x75
+#define	GPIO_DIR	0x76
+#define	GPIO_EN		0x77
+#define	GPIO_SET	0x78
+#define	GPIO_CLEAR	0x79
+#define	GPIO_TOGGLE	0x7A
+#define	ATO_CFG0	0x7B
+#define	ATO_CFGU	0x7D
+#define	ATO_CFGL	0x7E
+#define	ATO_CFGT	0x7F
+
+
+// Global Constants
+#define TOU_THRESH	0x0F
+#define	REL_THRESH	0x0A
 
 
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
@@ -163,6 +223,22 @@ static void IRQ_hook_init(void)
     nrf_drv_gpiote_in_event_enable(TOUCH_IRQ, true);
  }
 
+ret_code_t  mpr121Write(uint8_t reg, uint8_t val)
+ {
+
+    ret_code_t err_code;
+    uint8_t address;
+
+    address = MPR121_I2C_ADDR;
+
+    uint8_t packet[2] = {reg, val};
+    err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+    nrf_delay_ms(100);
+
+    return err_code;
+
+ }
+
 
 int main(void)
 {
@@ -192,15 +268,23 @@ int main(void)
       }
 
     if (!detected_device)
-    {
+     {
         SEGGER_RTT_printf(0,"No device was found.\n");
         NRF_LOG_FLUSH();
         while(1) {}
-    }
+     }
 
    SEGGER_RTT_printf(0,"I2C detection successful.\n");
 
-   uint8_t packet[2] = {MPR121_REG_TOUCH_CTRL, MPR121_CTRL_ALL_PADS_ON_FULL_BASELINE};
+  
+   uint8_t packet[2] = {MPR121_REG_SRST, MPR121_CTRL_SRST};
+
+   err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+
+   nrf_delay_ms(1000);
+   
+   packet[0] = MPR121_REG_TOUCH_CTRL;
+   packet[1] = MPR121_CTRL_ALL_PADS_ON_5BIT_BASELINE;
 
    err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
 
@@ -209,19 +293,39 @@ int main(void)
      SEGGER_RTT_printf(0,"MPR121 turned on.\n", address);
     }
 
+
+   mpr121Write(MHD_R, 0x01);
+   mpr121Write(NHD_R, 0x01);
+   mpr121Write(NCL_R, 0x00);
+   mpr121Write(FDL_R, 0x00);
+   
+   mpr121Write(MHD_F, 0x01);
+   mpr121Write(NHD_F, 0x01);
+   mpr121Write(NCL_F, 0xFF);
+   mpr121Write(FDL_F, 0x02);
+
+   mpr121Write(FIL_CFG, 0x04);
+
+   mpr121Write(ATO_CFGU, 0xC9);	
+   mpr121Write(ATO_CFGL, 0x82);	
+   mpr121Write(ATO_CFGT, 0xB5);
+   
+   mpr121Write(MPR121_REG_DEBOUNCE,0xFF);
+
+ 
    uint8_t i;
   
    // set touch threshold to 40 for all electrodes 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 15;
+      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0F;
       err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
     }
 
    // set release threshold to 20 for all electrodes
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 8;
+      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x0A;
       err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
     }
 
