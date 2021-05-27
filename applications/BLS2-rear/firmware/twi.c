@@ -1,16 +1,6 @@
-/* TWI instance ID. */
-#if TWI0_ENABLED
-#define TWI_INSTANCE_ID_0     0
-#elif TWI1_ENABLED
-#define TWI_INSTANCE_ID_1     1
-#endif
 
- /* Number of possible TWI addresses. */
-#define TWI_ADDRESSES      127
+#include "global.h"
 
-/* TWI instance. */
-static const nrf_drv_twi_t m_twi_0 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_0);
-static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
 void twi_init (void)
 {

@@ -1,8 +1,36 @@
+#include "mpr121.h"
+#include <stdint.h>
+
+#include "app_util_platform.h"
+#include "app_error.h"
+#include "global.h"
+
+
+ret_code_t  MPR121_write(uint8_t reg, uint8_t val)
+ {
+
+    ret_code_t err_code;
+    uint8_t address;
+
+    address = MPR121_I2C_ADDR;
+
+    uint8_t packet[2] = {reg, val};
+    err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+    nrf_delay_ms(100);
+
+    return err_code;
+
+ }
+
+
 
 uint8_t MPR121_init(void)
  {
-    address = MPR121_I2C_ADDR;
-
+    uint8_t address = MPR121_I2C_ADDR;
+    uint8_t err_code,reg_data;
+    bool detected_device;
+    
+    
     err_code = nrf_drv_twi_rx(&m_twi_0, address, &reg_data, sizeof(reg_data));
 
     if (err_code == NRF_SUCCESS)
@@ -20,14 +48,14 @@ uint8_t MPR121_init(void)
 
    uint8_t packet[2] = {MPR121_REG_SRST, MPR121_CTRL_SRST};
 
-   err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+   err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
 
    nrf_delay_ms(1000);
 
    packet[0] = MPR121_REG_TOUCH_CTRL;
    packet[1] = MPR121_CTRL_ALL_PADS_ON_5BIT_BASELINE;
 
-   err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+   err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
 
    if (err_code == NRF_SUCCESS)
     {
@@ -59,22 +87,22 @@ uint8_t MPR121_init(void)
    for(i = 0; i < 25; i += 2)
     {
       packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0F;
-      err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+      err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
     }
 
    // set release threshold to 20 for all electrodes
    for(i = 0; i < 25; i += 2)
     {
       packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x0A;
-      err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
+      err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
     }
-
+    
+  return 0;
 
  }
 
 
-
-ret_code_t MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
+void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
  {
 
      uint8_t reg_data;
@@ -82,37 +110,18 @@ ret_code_t MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity
      ret_code_t err_code;
 
      reg_addr = 0x00;
-     err_code = nrf_drv_twi_tx(&m_twi, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi, 0x5A, &reg_data, sizeof(reg_data));
+     err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
+     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data, sizeof(reg_data));
 
      SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data);
 
      reg_addr = 0x01;
-     err_code = nrf_drv_twi_tx(&m_twi, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi, 0x5A, &reg_data, sizeof(reg_data));
-     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-
+     err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
+     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data, sizeof(reg_data));
+     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X (%d)\n",reg_addr,reg_data,err_code);
+     
      NRF_LOG_FLUSH();
-
-     return err_code;
-
  }
  
- 
-ret_code_t  MPR121_write(uint8_t reg, uint8_t val)
- {
-
-    ret_code_t err_code;
-    uint8_t address;
-
-    address = MPR121_I2C_ADDR;
-
-    uint8_t packet[2] = {reg, val};
-    err_code = nrf_drv_twi_tx(&m_twi, address, packet, sizeof(packet),false);
-    nrf_delay_ms(100);
-
-    return err_code;
-
- }
  
  

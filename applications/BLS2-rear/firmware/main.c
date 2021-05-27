@@ -48,24 +48,9 @@
  *
  */
 
+#include "global.h"
 #include <stdbool.h>
 #include <stdint.h>
-//#include <nrf_drv_pwm.h>
-#include "nrf_delay.h"
-//#include "nrf_drv_pwm.h"
-//#include "app_util_platform.h"
-//#include "app_error.h"
-//#include "boards.h"
-//#include "bsp.h"
-//#include "app_timer.h"
-//#include "nrf_drv_clock.h"
-//#include "nrf_gpiote.h"
-#include "nrf_drv_gpiote.h"
-
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-#include "nrf_log_default_backends.h"
-#include "SEGGER_RTT.h"
 
 int main(void)
 {
