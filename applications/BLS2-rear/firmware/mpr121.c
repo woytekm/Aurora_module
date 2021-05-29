@@ -105,22 +105,39 @@ uint8_t MPR121_init(void)
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
  {
 
-     uint8_t reg_data;
+     uint8_t reg_data_0;
+     uint8_t reg_data_1;
      uint8_t reg_addr;
      ret_code_t err_code;
+     uint16_t touch_event;
 
      reg_addr = 0x00;
      err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data, sizeof(reg_data));
+     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data_0, sizeof(reg_data_0));
 
-     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data);
+     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data_0);
 
      reg_addr = 0x01;
      err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data, sizeof(reg_data));
-     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X (%d)\n",reg_addr,reg_data,err_code);
+     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data_1, sizeof(reg_data_1));
+     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X (%d)\n",reg_addr,reg_data_1,err_code);
+
+     touch_event =  ((uint16_t)reg_data_1 << 8) | reg_data_0;
+ 
+     if(!m_touch_event_in_progress)
+      {
+        SEGGER_RTT_printf(0,"MPR121: new touch event start\n");
+        m_touch_event_in_progress = true;
+        err_code = app_timer_start(m_touch_event_timer, APP_TIMER_TICKS(1000), NULL);
+        SEGGER_RTT_printf(0,"MPR121: touch event timer set (%d)\n",err_code);
+        APP_ERROR_CHECK(err_code); 
+      }
      
+     if(m_touch_event_queue_idx < MAX_TOUCH_EVENTS)
+        m_touch_event_queue[m_touch_event_queue_idx++] = touch_event;
+
      NRF_LOG_FLUSH();
+
  }
  
  

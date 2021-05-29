@@ -1,3 +1,6 @@
+#ifndef MPR121_H
+#define MPR121_H
+
 #define MPR121_I2C_ADDR 0x5A
 #define MPR121_REG_TOUCH_CTRL 0x5E
 #define MPR121_REG_TOUCH_THRESHOLD_BASE 0x41
@@ -62,3 +65,5 @@
 #define TOU_THRESH      0x0F
 #define REL_THRESH      0x0A
 
+
+#endif
