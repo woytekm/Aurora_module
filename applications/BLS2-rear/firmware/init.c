@@ -1,6 +1,5 @@
 #include "global.h"
 
- 
 void timer_init(void)
  {
 
@@ -29,6 +28,9 @@ uint8_t system_init(void)
 
    twi_init();
    MPR121_init();
+
+   m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+   memset(m_touch_event_timer, 0, sizeof(app_timer_t));
 
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();

@@ -1,4 +1,70 @@
 #include "global.h"
+#include "touch.h"
+
+void touch_event_timer_handler(void *p_context)
+ {
+
+  uint8_t i,event_code;
+  uint16_t touch_patterns[11][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
+                {{8,0,0,0,0,0},
+                {64,0,0,0,0,0},
+                {512,0,0,0,0,0},
+                {8,0,8,0,0,0},
+                {64,0,64,0,0,0},
+                {512,0,512,0,0,0},
+                {8,0,512,0,0,0},
+                {8,0,64,0,0,0},
+                {8,0,512,0,8,0},
+                {64,0,512,0,64,0},
+                {512,0,512,0,512,0}};
+
+  //SEGGER_RTT_printf(0, "Touch event summary:\n");
+
+  //for(i=0; i<m_touch_event_queue_idx; i++)
+  // SEGGER_RTT_printf(0, " event: %d\n",m_touch_event_queue[i]);
+
+  event_code = 0;
+
+  for(i=0; i<11; i++)
+   if(memcmp(&m_touch_event_queue,&touch_patterns[i],MAX_TOUCH_EVENTS*2) == 0) // *2 cause this is uint16_t array
+    event_code = i;
+
+  switch(event_code)
+   {
+     case T_L:
+      SEGGER_RTT_printf(0, "touch event: T_L\n");
+      break;
+
+     case T_M:
+      SEGGER_RTT_printf(0, "touch event: T_M\n");
+      break;
+
+     case T_R:
+      SEGGER_RTT_printf(0, "touch event: T_R\n");
+      break;
+
+     case T_L_DT:
+      SEGGER_RTT_printf(0, "touch event: T_L_DT\n");
+      break;
+
+     case T_M_DT:
+      SEGGER_RTT_printf(0, "touch event: T_M_DT\n");
+      break;
+
+     case T_R_DT:
+      SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
+      break;
+
+     case T_R_TT:
+      SEGGER_RTT_printf(0, "touch event: T_R_TT\n");
+      break;
+
+   }
+
+  m_touch_event_in_progress = false;
+  m_touch_event_queue_idx = 0;
+
+ }
 
 void touch_IRQ_init(void)
  {
@@ -19,17 +85,4 @@ void touch_IRQ_init(void)
     SEGGER_RTT_printf(0, "Touch IRQ init complete.\n");
  }
 
-void touch_event_timer_handler(void *p_context)
- {
 
-  uint8_t i;
-  
-  SEGGER_RTT_printf(0, "Touch event summary:\n");
-
-  for(i=0; i<m_touch_event_queue_idx; i++)
-   SEGGER_RTT_printf(0, " event: %d\n",m_touch_event_queue[i]);  
-  
-  m_touch_event_in_progress = false;
-  m_touch_event_queue_idx = 0;
-
- } 

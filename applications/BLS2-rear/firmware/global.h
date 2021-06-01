@@ -15,6 +15,7 @@
 
 #include "app_timer.h"
 #include "nrf_drv_clock.h"
+#include <stdlib.h>
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
@@ -31,7 +32,7 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
 #define MAX_TOUCH_EVENTS 6
 
-APP_TIMER_DEF(m_touch_event_timer);
+app_timer_t *m_touch_event_timer;
 
 uint16_t m_touch_event_queue[MAX_TOUCH_EVENTS];
 uint8_t m_touch_event_queue_idx;
@@ -41,8 +42,8 @@ bool m_touch_event_in_progress;
 
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 void touch_IRQ_init(void);
-void twi_init(void);
 void touch_event_timer_handler(void *p_context);
+void twi_init(void);
 uint8_t MPR121_init(void);
 uint8_t system_init(void);
 

@@ -5653,7 +5653,7 @@
 #endif
 
 // <o> APP_TIMER_CONFIG_IRQ_PRIORITY  - Interrupt priority
- 
+
 
 // <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
 // <0=> 0 (highest) 
@@ -5711,7 +5711,7 @@
 
 //==========================================================
 // <q> APP_TIMER_WITH_PROFILER  - Enable app_timer profiling
- 
+
 
 #ifndef APP_TIMER_WITH_PROFILER
 #define APP_TIMER_WITH_PROFILER 0
