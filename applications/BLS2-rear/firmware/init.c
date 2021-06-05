@@ -32,6 +32,10 @@ uint8_t system_init(void)
    m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_touch_event_timer, 0, sizeof(app_timer_t));
 
+   m_led_program_duty = 10000;   // step duration
+   m_led_program_speed = 3;
+   m_led_program_brightness = 1; // not used yet
+
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();
    SEGGER_RTT_printf(0,"app_timer_init()\n");

@@ -17,6 +17,9 @@
 #include "nrf_drv_clock.h"
 #include <stdlib.h>
 
+#include "aurora_board.h"
+
+
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
 #define TWI_INSTANCE_ID_1     1
@@ -38,6 +41,12 @@ uint16_t m_touch_event_queue[MAX_TOUCH_EVENTS];
 uint8_t m_touch_event_queue_idx;
 bool m_touch_event_in_progress;
 
+bool m_light_on;
+
+uint8_t m_led_program_speed;
+uint8_t m_led_program_brightness;
+uint16_t m_led_program_duty;
+
 // prototypes
 
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
@@ -46,5 +55,6 @@ void touch_event_timer_handler(void *p_context);
 void twi_init(void);
 uint8_t MPR121_init(void);
 uint8_t system_init(void);
-
+void light_start(uint8_t program, uint8_t speed, uint8_t brightness);
+void light_stop(void);
 #endif

@@ -37,6 +37,12 @@ void touch_event_timer_handler(void *p_context)
 
      case T_M:
       SEGGER_RTT_printf(0, "touch event: T_M\n");
+      if(m_light_on && (m_led_program_duty > 2000))
+       {
+        light_stop();
+        m_led_program_duty -= 1000;
+        light_start(1,m_led_program_speed,m_led_program_brightness);
+       }
       break;
 
      case T_R:
@@ -49,14 +55,22 @@ void touch_event_timer_handler(void *p_context)
 
      case T_M_DT:
       SEGGER_RTT_printf(0, "touch event: T_M_DT\n");
+      if(m_light_on && (m_led_program_duty < 60000))
+       {
+        light_stop();
+        m_led_program_duty += 1000;
+        light_start(1,m_led_program_speed,m_led_program_brightness);
+       }
       break;
 
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
+      light_start(1,m_led_program_speed,m_led_program_brightness);
       break;
 
      case T_R_TT:
       SEGGER_RTT_printf(0, "touch event: T_R_TT\n");
+      light_stop();
       break;
 
    }

@@ -56,6 +56,7 @@ SRC_FILES += \
   $(PROJ_DIR)/touch.c \
   $(PROJ_DIR)/init.c \
   $(PROJ_DIR)/main.c \
+  $(PROJ_DIR)/pwm.c \
   #$(SDK_ROOT)/components/libraries/bsp/bsp.c \
 
 # Include folders common to all targets
@@ -94,6 +95,7 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components/toolchain/cmsis/include \
   $(SDK_ROOT)/components/libraries/util \
   ../config \
+  ../../../../../../code/board \
   $(SDK_ROOT)/components/libraries/balloc \
   $(SDK_ROOT)/components/libraries/ringbuf \
   $(SDK_ROOT)/modules/nrfx/hal \

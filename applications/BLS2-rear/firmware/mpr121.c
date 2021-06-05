@@ -83,17 +83,17 @@ uint8_t MPR121_init(void)
 
    uint8_t i;
 
-   // set touch threshold to 40 for all electrodes
+   // set touch threshold 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0F;
+      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0A;  // 0x0F
       err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
     }
 
-   // set release threshold to 20 for all electrodes
+   // set release threshold 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x0A;
+      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x05;  // 0x0A
       err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
     }
     
