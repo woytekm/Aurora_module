@@ -111,6 +111,8 @@ void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t act
      ret_code_t err_code;
      uint16_t touch_event;
 
+     SEGGER_RTT_printf(0, "RTT DEBUG: in touch IRQ handler\n");
+
      reg_addr = 0x00;
      err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
      err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data_0, sizeof(reg_data_0));

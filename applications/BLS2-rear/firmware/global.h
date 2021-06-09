@@ -15,6 +15,12 @@
 
 #include "app_timer.h"
 #include "nrf_drv_clock.h"
+#include "nrf_gpiote.h"
+#include "nrf_drv_gpiote.h"
+
+#include "app_util_platform.h"
+#include "bsp.h"
+
 #include <stdlib.h>
 
 #include "aurora_board.h"
@@ -31,7 +37,7 @@
 static const nrf_drv_twi_t m_twi_0 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_0);
 static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
-#define TOUCH_IRQ NRF_GPIO_PIN_MAP(0,20)
+#define TOUCH_IRQ_PIN NRF_GPIO_PIN_MAP(0,20)
 
 #define MAX_TOUCH_EVENTS 6
 
@@ -47,6 +53,10 @@ uint8_t m_led_program_speed;
 uint8_t m_led_program_brightness;
 uint16_t m_led_program_duty;
 
+bool m_GPS_on;
+bool m_track_on;
+bool m_track_pause;
+
 // prototypes
 
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
@@ -57,4 +67,15 @@ uint8_t MPR121_init(void);
 uint8_t system_init(void);
 void light_start(uint8_t program, uint8_t speed, uint8_t brightness);
 void light_stop(void);
+
+void GPS_enable(void);
+void GPS_disable(void);
+
+void UART_config( uint8_t rts_pin_number,
+                          uint8_t txd_pin_number,
+                          uint8_t cts_pin_number,
+                          uint8_t rxd_pin_number,
+                          uint32_t speed,
+                          bool hwfc);
+
 #endif

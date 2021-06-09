@@ -36,6 +36,13 @@ uint8_t system_init(void)
    m_led_program_speed = 3;
    m_led_program_brightness = 1; // not used yet
 
+   nrf_gpio_cfg_output(PIN_GPS_ENA);
+   nrf_gpio_cfg_output(PIN_GPS_RST);
+   nrf_gpio_cfg_output(PIN_BRD_BUZZER);
+   nrf_gpio_cfg_output(PIN_BRD_LED);
+
+   //UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
+
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();
    SEGGER_RTT_printf(0,"app_timer_init()\n");
