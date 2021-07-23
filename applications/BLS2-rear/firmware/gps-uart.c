@@ -35,15 +35,16 @@ static volatile app_uart_states_t m_current_state = UART_OFF; /**< State of the 
 
 void parse_UART_input(char *line_data)
  {
-
-
   if(line_data[0] != 0xB5)
+   {
     SEGGER_RTT_printf(0, "RTT DEBUG: UART input: %s\n",line_data);  // print it if we can assume that it's a text line 
-  //uint16_t i = 0;
-  //while(line_data[i] != 0x00)
-  // SEGGER_RTT_printf(0,"%0X ",line_data[i++]);
+    parse_GPS_input(line_data);
 
-  //SEGGER_RTT_printf(0,"\n\n");
+    nrf_gpio_pin_set(USER_LED_1);
+    nrf_delay_us(100);
+    nrf_gpio_pin_clear(USER_LED_1);
+
+   }  
  }
 
  void UART_config(  uint8_t rts_pin_number,
@@ -178,8 +179,6 @@ uint32_t app_uart_put(uint8_t byte)
      m_tx_byte = byte;
      on_uart_event(ON_UART_PUT);
 
-     //SEGGER_RTT_printf(0, "RTT DEBUG: app_uart_put: %X, err: err_code: %d\n", byte, err_code);
-
      return err_code;
   }
 
@@ -187,17 +186,10 @@ void UART0_IRQHandler(void)
    {
      uint8_t rx_byte;
 
-    //SEGGER_RTT_printf(0, "RTT DEBUG: in UART IRQ handler\n");
- 
     // Handle reception
      if ((NRF_UART0->EVENTS_RXDRDY != 0) && (NRF_UART0->INTENSET & UART_INTENSET_RXDRDY_Msk))
       {
     
-     
-       nrf_gpio_pin_write(PIN_BRD_LED, 1);  // flash onboard led on incoming UART data
-       nrf_delay_us(90);
-       nrf_gpio_pin_write(PIN_BRD_LED, 0);
- 
        //app_uart_evt_t app_uart_event;
 
        // Clear UART RX event flag

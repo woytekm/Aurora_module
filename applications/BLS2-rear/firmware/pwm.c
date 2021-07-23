@@ -58,7 +58,6 @@ void light_start(uint8_t program, uint8_t speed, uint8_t brightness)
    }
  }
 
-
 void light_stop(void)
  {
   if(m_light_on == true)

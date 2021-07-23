@@ -39,9 +39,12 @@ uint8_t system_init(void)
    nrf_gpio_cfg_output(PIN_GPS_ENA);
    nrf_gpio_cfg_output(PIN_GPS_RST);
    nrf_gpio_cfg_output(PIN_BRD_BUZZER);
+   nrf_gpio_cfg_output(USER_LED_1);
+   nrf_gpio_cfg_output(USER_LED_2);
+   nrf_gpio_cfg_output(USER_LED_3);
    nrf_gpio_cfg_output(PIN_BRD_LED);
 
-   //UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
+   UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
 
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();

@@ -10,12 +10,9 @@ ret_code_t  MPR121_write(uint8_t reg, uint8_t val)
  {
 
     ret_code_t err_code;
-    uint8_t address;
-
-    address = MPR121_I2C_ADDR;
 
     uint8_t packet[2] = {reg, val};
-    err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+    err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     nrf_delay_ms(100);
 
     return err_code;
@@ -23,43 +20,42 @@ ret_code_t  MPR121_write(uint8_t reg, uint8_t val)
  }
 
 
-
 uint8_t MPR121_init(void)
  {
-    uint8_t address = MPR121_I2C_ADDR;
     uint8_t err_code,reg_data;
     bool detected_device;
     
+    detected_device = false;
     
-    err_code = nrf_drv_twi_rx(&m_twi_0, address, &reg_data, sizeof(reg_data));
+    err_code = nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_data, sizeof(reg_data));
 
     if (err_code == NRF_SUCCESS)
       {
          detected_device = true;
-         SEGGER_RTT_printf(0,"MPR121 device detected at address 0x%x.\n", address);
+         SEGGER_RTT_printf(0,"MPR121 device detected at address 0x%x.\n", MPR121_I2C_ADDR);
       }
 
     if (!detected_device)
      {
-        SEGGER_RTT_printf(0,"No MPR121 was found.\n");
+        SEGGER_RTT_printf(0,"No MPR121 was found (%d).\n",err_code);
         NRF_LOG_FLUSH();
         return 0;
      }
 
    uint8_t packet[2] = {MPR121_REG_SRST, MPR121_CTRL_SRST};
 
-   err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+   err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
 
    nrf_delay_ms(1000);
 
    packet[0] = MPR121_REG_TOUCH_CTRL;
    packet[1] = MPR121_CTRL_ALL_PADS_ON_5BIT_BASELINE;
 
-   err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+   err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
 
    if (err_code == NRF_SUCCESS)
     {
-     SEGGER_RTT_printf(0,"MPR121 turned on.\n", address);
+     SEGGER_RTT_printf(0,"MPR121 turned on.\n");
     }
 
 
@@ -87,14 +83,14 @@ uint8_t MPR121_init(void)
    for(i = 0; i < 25; i += 2)
     {
       packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0A;  // 0x0F
-      err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+      err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     }
 
    // set release threshold 
    for(i = 0; i < 25; i += 2)
     {
       packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x05;  // 0x0A
-      err_code = nrf_drv_twi_tx(&m_twi_0, address, packet, sizeof(packet),false);
+      err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     }
     
   return 0;
@@ -111,18 +107,20 @@ void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t act
      ret_code_t err_code;
      uint16_t touch_event;
 
-     SEGGER_RTT_printf(0, "RTT DEBUG: in touch IRQ handler\n");
+     //SEGGER_RTT_printf(0, "RTT DEBUG: in touch IRQ handler\n");
 
      reg_addr = 0x00;
-     err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data_0, sizeof(reg_data_0));
+     reg_data_0 = 0x00;
+     err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr, sizeof(reg_addr),true);
+     err_code = nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_data_0, sizeof(reg_data_0));
 
-     //SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data_0);
+     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr,reg_data_0);
 
      reg_addr = 0x01;
-     err_code = nrf_drv_twi_tx(&m_twi_0, 0x5A, &reg_addr, sizeof(reg_addr),true);
-     err_code = nrf_drv_twi_rx(&m_twi_0, 0x5A, &reg_data_1, sizeof(reg_data_1));
-     //SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X (%d)\n",reg_addr,reg_data_1,err_code);
+     reg_data_1 = 0x00;
+     err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr, sizeof(reg_addr),true);
+     err_code = nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_data_1, sizeof(reg_data_1));
+     SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X (%d)\n",reg_addr,reg_data_1,err_code);
 
      touch_event =  ((uint16_t)reg_data_1 << 8) | reg_data_0;
  

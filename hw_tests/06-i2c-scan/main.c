@@ -80,10 +80,13 @@ static const nrf_drv_twi_t m_twi = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID);
 void twi_init (void)
 {
     ret_code_t err_code;
+  
+    nrf_gpio_cfg_input(8, NRF_GPIO_PIN_PULLUP);
+    nrf_gpio_cfg_input(10, NRF_GPIO_PIN_PULLUP);
 
     const nrf_drv_twi_config_t twi_config = {
-       .scl                = NRF_GPIO_PIN_MAP(1,0),  //NRF_GPIO_PIN_MAP(1,0) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,8) - for touch sensor, when present (@0x5A)
-       .sda                = NRF_GPIO_PIN_MAP(0,24), //NRF_GPIO_PIN_MAP(0,24) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,10) - for touch sensor, when present (@0x5A)
+       .scl                = NRF_GPIO_PIN_MAP(0,8),  //NRF_GPIO_PIN_MAP(1,0) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,8) - for touch sensor, when present (@0x5A)
+       .sda                = NRF_GPIO_PIN_MAP(0,10), //NRF_GPIO_PIN_MAP(0,24) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,10) - for touch sensor, when present (@0x5A)
        .frequency          = NRF_DRV_TWI_FREQ_100K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
@@ -116,7 +119,6 @@ int main(void)
     ret_code_t err_code;
     uint8_t address;
     uint8_t reg_data; 
-    uint8_t reg_addr = 0xD0;
     bool detected_device = false;
 
     SEGGER_RTT_printf(0, "RTT DEBUG: TWI scanner started.\n");
@@ -146,20 +148,18 @@ int main(void)
     //while(1)
      {
 
-        //address = 0x76;
-
-        //SEGGER_RTT_printf(0,"Trying 0x%x.\n", address);
+        SEGGER_RTT_printf(0,"Trying 0x%x.\n", address);
 
         err_code = nrf_drv_twi_rx(&m_twi, address, &reg_data, sizeof(reg_data)); 
 
-        //reg_addr = 0x0D;
-        //err_code = nrf_drv_twi_tx(&m_twi, address, &reg_addr, sizeof(reg_addr),false);
-        //err_code = nrf_drv_twi_rx(&m_twi, address, &reg_data, sizeof(reg_data));
-
         if (err_code == NRF_SUCCESS)
         {
-            detected_device = true;
-            SEGGER_RTT_printf(0,"TWI device detected at address 0x%x.\n", address);
+          detected_device = true;
+          SEGGER_RTT_printf(0,"TWI device detected at address 0x%x.\n", address);
+        }
+        else 
+        {
+          SEGGER_RTT_printf(0,"TWI error 0x%x.\n", err_code);
         }
 
         NRF_LOG_FLUSH();
@@ -177,70 +177,5 @@ int main(void)
 
    SEGGER_RTT_printf(0,"I2C detection finished.\n");
 
-   while(1) {} 
-
-      reg_addr = 0x0D;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-      nrf_delay_ms(1000);
-
-      reg_addr = 0x0E;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-      nrf_delay_ms(1000);
-
-      reg_addr = 0x0F;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-      nrf_delay_ms(1000);
-
-      reg_addr = 0x20;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-      nrf_delay_ms(1000);
-
-      reg_addr = 0x0D;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      NRF_LOG_INFO("LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-
-      nrf_delay_ms(1000);
-
-    while(1)
-     {
-
-      reg_addr = 0x28;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-      nrf_delay_ms(100);
-
-
-      reg_addr = 0x29;
-      err_code = nrf_drv_twi_tx(&m_twi, 0x1D, &reg_addr, sizeof(reg_addr),false);
-      err_code = nrf_drv_twi_rx(&m_twi, 0x1D, &reg_data, sizeof(reg_data));
-
-      SEGGER_RTT_printf(0,"LIS3DSHTR: reg 0x%X: 0x%X\n",reg_addr,reg_data);
-      NRF_LOG_FLUSH();
-
-      nrf_delay_ms(1000); 
-
-     }
 }
 /** @} */

@@ -56,6 +56,7 @@ SRC_FILES += \
   $(PROJ_DIR)/main.c \
   $(PROJ_DIR)/pwm.c \
   $(PROJ_DIR)/gps-uart.c \
+  $(PROJ_DIR)/gps-input.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   #$(SDK_ROOT)/components/libraries/bsp/bsp.c \
@@ -209,3 +210,8 @@ CMSIS_CONFIG_TOOL := $(SDK_ROOT)/external_tools/cmsisconfig/CMSIS_Configuration_
 sdk_config:
 	java -jar $(CMSIS_CONFIG_TOOL) $(SDK_CONFIG_FILE)
 
+run_jlink:
+	JLinkExe -if swd -device nrf52 -speed auto -autoconnect 1
+
+run_rtt:
+	JLinkRTTClient

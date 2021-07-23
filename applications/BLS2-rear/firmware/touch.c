@@ -6,17 +6,17 @@ void touch_event_timer_handler(void *p_context)
 
   uint8_t i,event_code;
   uint16_t touch_patterns[11][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
-                {{8,0,0,0,0,0},
-                {64,0,0,0,0,0},
-                {512,0,0,0,0,0},
-                {8,0,8,0,0,0},
-                {64,0,64,0,0,0},
-                {512,0,512,0,0,0},
-                {8,0,512,0,0,0},
-                {8,0,64,0,0,0},
-                {8,0,512,0,8,0},
-                {64,0,512,0,64,0},
-                {512,0,512,0,512,0}};
+                {{1,0,0,0,0,0},
+                {2,0,0,0,0,0},
+                {4,0,0,0,0,0},
+                {1,0,1,0,0,0},
+                {2,0,2,0,0,0},
+                {4,0,4,0,0,0},
+                {1,0,4,0,0,0},
+                {1,0,2,0,0,0},
+                {1,0,4,0,1,0},
+                {2,0,4,0,2,0},
+                {4,0,4,0,4,0}};
 
   SEGGER_RTT_printf(0, "Touch event timer end\n");
 
@@ -103,5 +103,4 @@ void touch_IRQ_init(void)
 
     SEGGER_RTT_printf(0, "Touch IRQ init complete.\n");
  }
-
 

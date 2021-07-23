@@ -21,10 +21,12 @@
 #include "app_util_platform.h"
 #include "bsp.h"
 
+#include "ubxmessage.h"
+
 #include <stdlib.h>
+#include <time.h>
 
 #include "aurora_board.h"
-
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
@@ -37,7 +39,11 @@
 static const nrf_drv_twi_t m_twi_0 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_0);
 static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
-#define TOUCH_IRQ_PIN NRF_GPIO_PIN_MAP(0,20)
+#define TOUCH_IRQ_PIN NRF_GPIO_PIN_MAP(1,10)
+
+#define USER_LED_3 NRF_GPIO_PIN_MAP(0,3)
+#define USER_LED_2 NRF_GPIO_PIN_MAP(0,28)
+#define USER_LED_1 NRF_GPIO_PIN_MAP(1,13)
 
 #define MAX_TOUCH_EVENTS 6
 
@@ -52,6 +58,64 @@ bool m_light_on;
 uint8_t m_led_program_speed;
 uint8_t m_led_program_brightness;
 uint16_t m_led_program_duty;
+
+uint8_t G_fixes;
+uint8_t G_GPS_opMode;
+uint8_t G_GPS_navMode;
+uint8_t G_date_synced;
+uint8_t G_time_synced;
+uint8_t G_GPS_day;
+uint8_t G_GPS_month;
+uint8_t G_GPS_year;
+uint8_t G_last_UBX_ACK_state;
+bool G_GPS_cmd_sent;
+UBXMsgBuffer G_last_received_UBX_msg;
+enum UBX_ACK_STATE { UBX_ACK, UBX_NAK, UBX_UNKNOWN };
+
+uint8_t G_current_speed;
+
+#define NMEA_TIME_FORMAT        "%H%M%S"
+#define NMEA_TIME_FORMAT_LEN    6
+
+#define NMEA_DATE_FORMAT        "%d%m%y"
+#define NMEA_DATE_FORMAT_LEN    6
+
+ typedef struct {
+           double minutes;
+           int degrees;
+  } degmin_position_t;
+
+  typedef struct {
+          struct tm time;
+          degmin_position_t m_longitude;
+          degmin_position_t m_latitude;
+          char nmea_longitude[12];
+          char nmea_latitude[12];
+          double HDOP;
+          int n_satellites;
+          int altitude;
+          char altitude_unit;
+ } nmea_gpgga_t;
+
+nmea_gpgga_t G_current_position;
+nmea_gpgga_t G_prev_position;
+
+uint8_t G_logger_buffer_idx;
+
+char *G_current_gpx_filename;
+bool G_gpx_wrote_header;
+bool G_gpx_wrote_footer;
+
+typedef struct GPS_settings{
+  UBXU1_t lp_mode;
+  UBXCFG_PM2Flags pm_flags;
+  UBXU4_t pm_update_period;
+  UBXU4_t pm_search_period;
+  UBXU4_t pm_grid_offset;
+  UBXU2_t pm_on_time; 
+  UBXU2_t pm_min_acq_time;
+ } GPS_settings_t;
+
 
 bool m_GPS_on;
 bool m_track_on;
@@ -78,4 +142,6 @@ void UART_config( uint8_t rts_pin_number,
                           uint32_t speed,
                           bool hwfc);
 
+void parse_GPS_input(char *input_string);
+   
 #endif

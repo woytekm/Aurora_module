@@ -23,7 +23,7 @@ void twi_init (void)
        .clear_bus_init     = false
     };
 
-    NRF_LOG_INFO("TWI init.\n");
+    SEGGER_RTT_printf(0, "TWI init.\n");
     NRF_LOG_FLUSH();
     
     err_code = nrf_drv_twi_init(&m_twi_0, &twi_0_config, NULL, NULL);
@@ -32,7 +32,7 @@ void twi_init (void)
     err_code = nrf_drv_twi_init(&m_twi_1, &twi_1_config, NULL, NULL);
     APP_ERROR_CHECK(err_code);
 
-    NRF_LOG_INFO("TWI enable.\n");
+    SEGGER_RTT_printf(0, "TWI enable.\n");
     NRF_LOG_FLUSH();
     nrf_drv_twi_enable(&m_twi_0);
     nrf_drv_twi_enable(&m_twi_1);
