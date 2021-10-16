@@ -3,6 +3,7 @@
 
 #include "app_util_platform.h"
 #include "app_error.h"
+#include "app_timer.h"
 #include "global.h"
 
 
@@ -18,6 +19,40 @@ ret_code_t  MPR121_write(uint8_t reg, uint8_t val)
     return err_code;
 
  }
+
+
+uint8_t  MPR121_off(void)
+ {
+   uint8_t err_code;
+   uint8_t packet[2];
+   packet[0] = MPR121_REG_TOUCH_CTRL;
+   packet[1] = MPR121_CTRL_OFF;
+
+   err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
+   
+   return err_code;
+
+ }
+
+
+uint8_t  MPR121_on_no_baseline(void)
+ {
+   uint8_t err_code;
+   uint8_t packet[2] = {MPR121_REG_SRST, MPR121_CTRL_SRST};
+
+   //err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
+
+   nrf_delay_ms(1000);
+
+   packet[0] = MPR121_REG_TOUCH_CTRL;
+   packet[1] = MPR121_CTRL_MY_PADS_ON_NO_BASELINE;
+
+   err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
+   
+   return err_code;
+
+ }
+
 
 
 uint8_t MPR121_init(void)
@@ -49,7 +84,7 @@ uint8_t MPR121_init(void)
    nrf_delay_ms(1000);
 
    packet[0] = MPR121_REG_TOUCH_CTRL;
-   packet[1] = MPR121_CTRL_ALL_PADS_ON_5BIT_BASELINE;
+   packet[1] = MPR121_CTRL_MY_PADS_ON_5BIT_BASELINE;
 
    err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
 
@@ -82,14 +117,14 @@ uint8_t MPR121_init(void)
    // set touch threshold 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0A;  // 0x0F
+      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0A;  // 0x0A
       err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     }
 
    // set release threshold 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x05;  // 0x0A
+      packet[0] = MPR121_REG_RELEASE_THRESHOLD_BASE+i; packet[1] = 0x05;  // 0x05
       err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     }
     

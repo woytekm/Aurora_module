@@ -1,11 +1,23 @@
 #include "global.h"
 #include "touch.h"
 
+void touch_reset_timer_handler(void *p_context)
+ {
+   
+   if(m_GPS_on)
+    {
+      SEGGER_RTT_printf(0, "touch reset: resettig touch controller...%d\n");
+      MPR121_off();
+      nrf_delay_us(5000);
+      MPR121_on_no_baseline();
+    }
+
+ }
 void touch_event_timer_handler(void *p_context)
  {
 
   uint8_t i,event_code;
-  uint16_t touch_patterns[11][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
+  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
                 {{1,0,0,0,0,0},
                 {2,0,0,0,0,0},
                 {4,0,0,0,0,0},
@@ -16,7 +28,8 @@ void touch_event_timer_handler(void *p_context)
                 {1,0,2,0,0,0},
                 {1,0,4,0,1,0},
                 {2,0,4,0,2,0},
-                {4,0,4,0,4,0}};
+                {4,0,4,0,4,0},
+                {2,0,2,0,2,0}};
 
   SEGGER_RTT_printf(0, "Touch event timer end\n");
 
@@ -25,7 +38,7 @@ void touch_event_timer_handler(void *p_context)
 
   event_code = 254;
 
-  for(i=0; i<11; i++)
+  for(i=0; i<TOUCH_PATTERNS; i++)
    if(memcmp(&m_touch_event_queue,&touch_patterns[i],MAX_TOUCH_EVENTS*2) == 0) // *2 cause this is uint16_t array
     event_code = i;
 
@@ -37,11 +50,11 @@ void touch_event_timer_handler(void *p_context)
 
      case T_M:
       SEGGER_RTT_printf(0, "touch event: T_M\n");
-      if(m_light_on && (m_led_program_duty > 2000))
+      if(m_light_on && (m_led_program_duty < 60000))
        {
         light_stop();
-        m_led_program_duty -= 1000;
-        light_start(1,m_led_program_speed,m_led_program_brightness);
+        m_led_program_duty += 1000;
+        light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
        }
       break;
 
@@ -52,25 +65,48 @@ void touch_event_timer_handler(void *p_context)
      case T_L_DT:
       SEGGER_RTT_printf(0, "touch event: T_L_DT\n");
       if(!m_GPS_on)
-       GPS_enable();
+       {
+         MPR121_off();
+         GPS_enable();
+         nrf_delay_ms(3000);
+         //MPR121_init();
+         MPR121_on_no_baseline();
+       }
       else 
-       GPS_disable();
+       {
+        MPR121_off();
+        GPS_disable();
+        nrf_delay_us(5000);
+        MPR121_init();
+        MPR121_on_no_baseline();
+       }
       break;
-
 
      case T_M_DT:
       SEGGER_RTT_printf(0, "touch event: T_M_DT\n");
       if(m_light_on && (m_led_program_duty < 60000))
        {
         light_stop();
-        m_led_program_duty += 1000;
-        light_start(1,m_led_program_speed,m_led_program_brightness);
+        m_led_program_duty -= 1000;
+        light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+       }
+      break;
+
+     case T_M_TT:
+      SEGGER_RTT_printf(0, "touch event: T_M_TT\n");
+      if(m_light_on)
+       {
+        if(m_led_program == LED_PGMS)
+          m_led_program = 1;
+        else m_led_program++;
+        light_stop();
+        light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
        }
       break;
 
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
-      light_start(1,m_led_program_speed,m_led_program_brightness);
+      light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
       break;
 
      case T_R_TT:

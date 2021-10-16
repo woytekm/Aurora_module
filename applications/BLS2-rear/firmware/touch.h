@@ -8,6 +8,8 @@
 // or sequences of single taps on different sensors (ie: left - right - left: T_L_R_L), DT - double tap, TT - tripple tap
 //
 
+#define TOUCH_PATTERNS 12 
+
 enum touch_events 
  {T_L,
   T_M,
@@ -19,6 +21,7 @@ enum touch_events
   T_L_M,
   T_L_R_L,
   T_M_R_M,
-  T_R_TT};
+  T_R_TT,
+  T_M_TT};
 
 #endif 

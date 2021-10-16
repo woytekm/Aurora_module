@@ -14,6 +14,7 @@
 #include "boards.h"
 
 #include "app_timer.h"
+#include "app_scheduler.h"
 #include "nrf_drv_clock.h"
 #include "nrf_gpiote.h"
 #include "nrf_drv_gpiote.h"
@@ -48,6 +49,7 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 #define MAX_TOUCH_EVENTS 6
 
 app_timer_t *m_touch_event_timer;
+app_timer_t *m_touch_reset_timer;
 
 uint16_t m_touch_event_queue[MAX_TOUCH_EVENTS];
 uint8_t m_touch_event_queue_idx;
@@ -55,6 +57,9 @@ bool m_touch_event_in_progress;
 
 bool m_light_on;
 
+#define LED_PGMS 3  // coded in pwm.c
+
+uint8_t m_led_program;
 uint8_t m_led_program_speed;
 uint8_t m_led_program_brightness;
 uint16_t m_led_program_duty;
@@ -126,8 +131,11 @@ bool m_track_pause;
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
 void touch_IRQ_init(void);
 void touch_event_timer_handler(void *p_context);
+void touch_reset_timer_handler(void *p_context);
 void twi_init(void);
 uint8_t MPR121_init(void);
+uint8_t MPR121_off(void);
+uint8_t MPR121_on_no_baseline(void);
 uint8_t system_init(void);
 void light_start(uint8_t program, uint8_t speed, uint8_t brightness);
 void light_stop(void);

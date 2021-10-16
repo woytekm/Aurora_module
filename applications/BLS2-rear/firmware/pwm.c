@@ -37,19 +37,98 @@ void light_start(uint8_t program, uint8_t speed, uint8_t brightness)
 
     // This array cannot be allocated on stack (hence "static") and it must
     // be in RAM (hence no "const", though its content is not changed).
-    static uint16_t /*const*/ seq_values[] =
+
+    static uint16_t /*const*/ pgm_1_seq_values[] =
                  {
-                  0,
                   0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x0
                  };
 
-    nrf_pwm_sequence_t const seq =
-    {
-        .values.p_common = seq_values,
-        .length          = NRF_PWM_VALUES_LENGTH(seq_values),
+    static uint16_t /*const*/ pgm_2_seq_values[] =
+                 {
+                  0x0,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000,
+                  0x8000
+                 };
+
+    static uint16_t /*const*/ pgm_3_seq_values[] =
+                 {
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000,
+                  0x0,
+                  0x8000,
+                  0x8000
+                 };
+
+    nrf_pwm_sequence_t  seq;
+
+    if(program == 1)
+     seq = (nrf_pwm_sequence_t)
+     {
+        .values.p_common = pgm_1_seq_values,
+        .length          = NRF_PWM_VALUES_LENGTH(pgm_1_seq_values),
         .repeats         = 0,
         .end_delay       = 0
-    };
+     };
+    else if(program == 2)
+     seq = (nrf_pwm_sequence_t)
+     {
+        .values.p_common = pgm_2_seq_values,
+        .length          = NRF_PWM_VALUES_LENGTH(pgm_2_seq_values),
+        .repeats         = 0,
+        .end_delay       = 0
+     };
+    else if(program == 3)
+     seq = (nrf_pwm_sequence_t)
+     {
+        .values.p_common = pgm_3_seq_values,
+        .length          = NRF_PWM_VALUES_LENGTH(pgm_3_seq_values),
+        .repeats         = 0,
+        .end_delay       = 0
+     };
+
+
+
 
     m_light_on = true;
 

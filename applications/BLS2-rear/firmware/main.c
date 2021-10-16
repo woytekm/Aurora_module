@@ -17,7 +17,8 @@ int main(void)
  system_init();
 
   for (;;)
-   {       
+   {   
+        //SEGGER_RTT_printf(0, "WFE.\n");
         // Wait for an event.
         __WFE();
 
@@ -26,6 +27,7 @@ int main(void)
         __WFE();
 
         NRF_LOG_FLUSH();
+        //app_sched_execute();
     }
  
 

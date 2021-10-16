@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include "global.h"
-#include "ubxmessage.h"
+//#include "ubxmessage.h"
 
 
 char * strdup (const char *s)
@@ -190,9 +190,9 @@ void GPS_parse_GPGGA(char *GPGGA_msg)
 
      if(G_current_position.n_satellites > 0)
        {
-         nrf_gpio_pin_set(PIN_BRD_LED);
-         nrf_delay_us(100);
-         nrf_gpio_pin_clear(PIN_BRD_LED);
+         nrf_gpio_pin_set(USER_LED_1);
+         nrf_delay_us(500);
+         nrf_gpio_pin_clear(USER_LED_1);
        }
 
 #ifdef SEGGER_RTT_DEBUG

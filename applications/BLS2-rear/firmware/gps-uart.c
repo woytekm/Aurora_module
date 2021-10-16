@@ -37,13 +37,11 @@ void parse_UART_input(char *line_data)
  {
   if(line_data[0] != 0xB5)
    {
-    SEGGER_RTT_printf(0, "RTT DEBUG: UART input: %s\n",line_data);  // print it if we can assume that it's a text line 
+    //SEGGER_RTT_printf(0, "RTT DEBUG: UART input: %s\n",line_data);  // print it if we can assume that it's a text line 
     parse_GPS_input(line_data);
-
-    nrf_gpio_pin_set(USER_LED_1);
-    nrf_delay_us(100);
-    nrf_gpio_pin_clear(USER_LED_1);
-
+    //nrf_gpio_pin_set(USER_LED_1);
+    //nrf_delay_us(100);
+    //nrf_gpio_pin_clear(USER_LED_1);
    }  
  }
 
