@@ -1,16 +1,40 @@
 #include "global.h"
 #include "touch.h"
+#include "mpr121.h"
 
 void touch_reset_timer_handler(void *p_context)
  {
-   
-   if(m_GPS_on)
-    {
-      SEGGER_RTT_printf(0, "touch reset: resettig touch controller...%d\n");
-      MPR121_off();
-      nrf_delay_us(5000);
-      MPR121_on_no_baseline();
-    }
+ 
+   SEGGER_RTT_printf(0, "touch reset: invoked \n");
+   uint8_t reg_addr_04 = 0x04;
+   uint8_t reg_filt_data_lsb = 0x00;
+
+   uint8_t reg_addr_05 = 0x05;
+   uint8_t reg_filt_data_msb = 0x00;
+
+   uint8_t reg_addr_1e = 0x1E;
+   uint8_t reg_baseline = 0x00;
+
+   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_04, sizeof(uint8_t),true);
+   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_filt_data_lsb, sizeof(uint8_t));
+
+   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_05, sizeof(uint8_t),true);
+   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_filt_data_msb, sizeof(uint8_t));
+
+   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_1e, sizeof(uint8_t),true);
+   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_baseline, sizeof(uint8_t));
+
+   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_04,reg_filt_data_lsb);
+   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_05,reg_filt_data_msb);
+   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_1e,reg_baseline);
+
+   //if(m_GPS_on)
+   // {
+   //   SEGGER_RTT_printf(0, "touch reset: resettig touch controller...%d\n");
+   //   MPR121_off();
+   //   nrf_delay_us(5000);
+   //   MPR121_on_no_baseline();
+   // }
 
  }
 void touch_event_timer_handler(void *p_context)

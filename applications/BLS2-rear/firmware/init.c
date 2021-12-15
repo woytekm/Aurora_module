@@ -16,7 +16,7 @@ void timer_init(void)
   APP_ERROR_CHECK(err_code);
   // subsequent app timers created here
   
-  #define TOUCH_RST_TIMER_INTERVAL APP_TIMER_TICKS(30000)
+  #define TOUCH_RST_TIMER_INTERVAL APP_TIMER_TICKS(3000)
 
   //err_code = app_timer_start(m_touch_reset_timer, TOUCH_RST_TIMER_INTERVAL, NULL);
   APP_ERROR_CHECK(err_code);
@@ -50,7 +50,13 @@ uint8_t system_init(void)
    m_touch_event_in_progress = false;
 
    twi_init();
-   MPR121_init();
+
+   if(MPR121_init() == 0)
+    {
+     SEGGER_RTT_printf(0,"touch_IRQ_init()\n");
+     touch_IRQ_init();
+    } 
+   
    nrf_delay_us(5000);
 
    m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
@@ -90,10 +96,7 @@ uint8_t system_init(void)
    app_timer_init();
    SEGGER_RTT_printf(0,"timer_init()\n");
    timer_init();
-
-   SEGGER_RTT_printf(0,"touch_IRQ_init()\n");
-   touch_IRQ_init();
-
+   SEGGER_RTT_printf(0,"init done.\n");
    return 0;
 
  } 

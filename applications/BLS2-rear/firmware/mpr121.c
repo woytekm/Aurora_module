@@ -74,7 +74,7 @@ uint8_t MPR121_init(void)
      {
         SEGGER_RTT_printf(0,"No MPR121 was found (%d).\n",err_code);
         NRF_LOG_FLUSH();
-        return 0;
+        return 1;
      }
 
    uint8_t packet[2] = {MPR121_REG_SRST, MPR121_CTRL_SRST};
@@ -104,9 +104,9 @@ uint8_t MPR121_init(void)
    MPR121_write(NCL_F, 0xFF);
    MPR121_write(FDL_F, 0x02);
 
-   MPR121_write(FIL_CFG, 0x04);
+   MPR121_write(FIL_CFG, 0x04);  // 0x04
 
-   MPR121_write(ATO_CFGU, 0xC9);
+   MPR121_write(ATO_CFGU, 0xC9); // 0xC9
    MPR121_write(ATO_CFGL, 0x82);
    MPR121_write(ATO_CFGT, 0xB5);
 
@@ -117,7 +117,7 @@ uint8_t MPR121_init(void)
    // set touch threshold 
    for(i = 0; i < 25; i += 2)
     {
-      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x0A;  // 0x0A
+      packet[0] = MPR121_REG_TOUCH_THRESHOLD_BASE+i; packet[1] = 0x10;  // 0x0A
       err_code = nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, packet, sizeof(packet),false);
     }
 

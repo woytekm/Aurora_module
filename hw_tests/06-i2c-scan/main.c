@@ -85,8 +85,8 @@ void twi_init (void)
     nrf_gpio_cfg_input(10, NRF_GPIO_PIN_PULLUP);
 
     const nrf_drv_twi_config_t twi_config = {
-       .scl                = NRF_GPIO_PIN_MAP(0,8),  //NRF_GPIO_PIN_MAP(1,0) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,8) - for touch sensor, when present (@0x5A)
-       .sda                = NRF_GPIO_PIN_MAP(0,10), //NRF_GPIO_PIN_MAP(0,24) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,10) - for touch sensor, when present (@0x5A)
+       .scl                = NRF_GPIO_PIN_MAP(1,0),  //NRF_GPIO_PIN_MAP(1,0) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,8) - for touch sensor, when present (@0x5A)
+       .sda                = NRF_GPIO_PIN_MAP(0,24), //NRF_GPIO_PIN_MAP(0,24) - for accelerometer (@0x1D) + pressure/temp sensor (@0x77), NRF_GPIO_PIN_MAP(0,10) - for touch sensor, when present (@0x5A)
        .frequency          = NRF_DRV_TWI_FREQ_100K,
        .interrupt_priority = APP_IRQ_PRIORITY_HIGH,
        .clear_bus_init     = false
