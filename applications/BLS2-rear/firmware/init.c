@@ -5,6 +5,8 @@ void timer_init(void)
 
   ret_code_t err_code;
 
+#ifdef USE_MPR121
+
   err_code = app_timer_create(&m_touch_event_timer,
                                APP_TIMER_MODE_SINGLE_SHOT,
                                touch_event_timer_handler);
@@ -20,6 +22,8 @@ void timer_init(void)
 
   //err_code = app_timer_start(m_touch_reset_timer, TOUCH_RST_TIMER_INTERVAL, NULL);
   APP_ERROR_CHECK(err_code);
+
+#endif
 
  }
 
@@ -47,9 +51,12 @@ static void lfclk_request(void)
 uint8_t system_init(void)
  {
 
-   m_touch_event_in_progress = false;
 
    twi_init();
+
+#ifdef  USE_MPR121
+
+   m_touch_event_in_progress = false;
 
    if(MPR121_init() == 0)
     {
@@ -64,6 +71,8 @@ uint8_t system_init(void)
 
    m_touch_reset_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_touch_reset_timer, 0, sizeof(app_timer_t));
+
+#endif
 
    m_led_program = 1;
    m_led_program_duty = 10000;   // step duration
