@@ -40,6 +40,7 @@
 static const nrf_drv_twi_t m_twi_0 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_0);
 static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
+
 #define TOUCH_IRQ_PIN NRF_GPIO_PIN_MAP(1,10)
 
 #define USER_LED_3 NRF_GPIO_PIN_MAP(0,3)

@@ -4,6 +4,7 @@
 
 void twi_init (void)
 {
+
     ret_code_t err_code;
 
     const nrf_drv_twi_config_t twi_0_config = {
