@@ -27,7 +27,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "buttons.h"
 #include "aurora_board.h"
+
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0

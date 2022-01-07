@@ -3,9 +3,8 @@
 void timer_init(void)
  {
 
-  ret_code_t err_code;
-
 #ifdef USE_MPR121
+  ret_code_t err_code;
 
   err_code = app_timer_create(&m_touch_event_timer,
                                APP_TIMER_MODE_SINGLE_SHOT,
@@ -99,6 +98,9 @@ uint8_t system_init(void)
 
    UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
 
+   init_buttons();
+     
+
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();
    SEGGER_RTT_printf(0,"app_timer_init()\n");
@@ -107,5 +109,5 @@ uint8_t system_init(void)
    timer_init();
    SEGGER_RTT_printf(0,"init done.\n");
    return 0;
-
+  
  } 

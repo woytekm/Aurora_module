@@ -1,40 +1,41 @@
-#include "global.h"
-#include <strings.h>
+#include "buttons.h"
 
-void map_buttons(char *b1, char *b2, char *b3, char *b4, char *b5, char *b6)
- {
-   strncpy(m_buttons[0].btn_text,b1,DSCR_LEN);
-   strncpy(m_buttons[1].btn_text,b2,DSCR_LEN);
-   strncpy(m_buttons[2].btn_text,b3,DSCR_LEN);
-   strncpy(m_buttons[3].btn_text,b4,DSCR_LEN);
-   strncpy(m_buttons[4].btn_text,b5,DSCR_LEN);
-   strncpy(m_buttons[5].btn_text,b6,DSCR_LEN);
- }
+#include "nrf_drv_twi.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
+#include "nrf_log_default_backends.h"
+#include "SEGGER_RTT.h"
 
-void zero_buttons()
- {
-   bzero(m_buttons[0].btn_text,DSCR_LEN);
-   bzero(m_buttons[1].btn_text,DSCR_LEN);
-   bzero(m_buttons[2].btn_text,DSCR_LEN);
-   bzero(m_buttons[3].btn_text,DSCR_LEN);
-   bzero(m_buttons[4].btn_text,DSCR_LEN);
-   bzero(m_buttons[5].btn_text,DSCR_LEN);
- }
+#include "nrf_drv_gpiote.h"
+
+#include "nrf_delay.h"
+
+#include "boards.h"
+
+#include "app_timer.h"
+#include "app_scheduler.h"
+#include "nrf_drv_clock.h"
+#include "nrf_gpiote.h"
+#include "nrf_drv_gpiote.h"
+
+#include "app_util_platform.h"
+#include "bsp.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 void clear_buttons()
  {
    m_buttons[0].press = false;
    m_buttons[1].press = false;
    m_buttons[2].press = false;
-   m_buttons[3].press = false;
-   m_buttons[4].press = false;
-   m_buttons[5].press = false;
  }
 
 void button_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
  {
 
-   SEGGER_RTT_printf(0, "button_handler triggered: %d, (%d,%d).\n",pin,PIN_BTN1,PIN_BTN6);
+   SEGGER_RTT_printf(0, "button_handler triggered: %d\n",pin);
 
    if((pin == PIN_BTN1) && (action ==  NRF_GPIOTE_POLARITY_HITOLO))
     {
@@ -50,21 +51,6 @@ void button_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     {
      m_buttons[2].press = true;
     }
-
-  if((pin == PIN_BTN4) && (action ==  NRF_GPIOTE_POLARITY_HITOLO))
-    {
-     m_buttons[3].press = true;
-    }
-
-  if((pin == PIN_BTN5) && (action ==  NRF_GPIOTE_POLARITY_HITOLO))
-    {
-     m_buttons[4].press = true;
-    }
-
-   if((pin == PIN_BTN6) && (action ==  NRF_GPIOTE_POLARITY_HITOLO))
-    {
-     m_buttons[5].press = true;
-    }
  }
 
 void init_buttons(void)
@@ -75,15 +61,16 @@ void init_buttons(void)
     err_code = nrf_drv_gpiote_init();
     APP_ERROR_CHECK(err_code);
 
+    nrf_gpio_cfg_input(PIN_BTN1,NRF_GPIO_PIN_NOPULL);
+    nrf_gpio_cfg_input(PIN_BTN2,NRF_GPIO_PIN_NOPULL);
+    nrf_gpio_cfg_input(PIN_BTN3,NRF_GPIO_PIN_NOPULL);
+    
     nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_HITOLO(false);
     in_config.pull = NRF_GPIO_PIN_NOPULL;
 
     err_code = nrf_drv_gpiote_in_init(PIN_BTN1, &in_config, button_handler);
     err_code = nrf_drv_gpiote_in_init(PIN_BTN2, &in_config, button_handler);
     err_code = nrf_drv_gpiote_in_init(PIN_BTN3, &in_config, button_handler);
-    err_code = nrf_drv_gpiote_in_init(PIN_BTN4, &in_config, button_handler);
-    err_code = nrf_drv_gpiote_in_init(PIN_BTN5, &in_config, button_handler);
-    err_code = nrf_drv_gpiote_in_init(PIN_BTN6, &in_config, button_handler);
 
     SEGGER_RTT_printf(0, "GPIOTE init done (%d)\n",err_code);
     APP_ERROR_CHECK(err_code);
@@ -91,9 +78,5 @@ void init_buttons(void)
     nrf_drv_gpiote_in_event_enable(PIN_BTN1, true);
     nrf_drv_gpiote_in_event_enable(PIN_BTN2, true);
     nrf_drv_gpiote_in_event_enable(PIN_BTN3, true);
-    nrf_drv_gpiote_in_event_enable(PIN_BTN4, true);
-    nrf_drv_gpiote_in_event_enable(PIN_BTN5, true);
-    nrf_drv_gpiote_in_event_enable(PIN_BTN6, true);
-
 
  }
