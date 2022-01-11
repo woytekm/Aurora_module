@@ -17,11 +17,8 @@ enum touch_events
   T_L_DT,
   T_M_DT,
   T_R_DT,
-  T_L_R,
-  T_L_M,
-  T_L_R_L,
-  T_M_R_M,
-  T_R_TT,
-  T_M_TT};
+  T_L_TT,
+  T_M_TT,
+  T_R_TT};
 
 #endif 

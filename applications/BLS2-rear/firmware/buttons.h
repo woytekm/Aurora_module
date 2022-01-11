@@ -1,8 +1,6 @@
 #ifndef BUTTONS_H
 #define BUTTONS_H
 
-#include <stdbool.h>
-
 #define HW_BUTTONS 3
 
 #define PIN_BTN1 NRF_GPIO_PIN_MAP(0,8)
@@ -20,6 +18,6 @@ button_t m_buttons[HW_BUTTONS];
 void init_buttons(void);
 void zero_buttons(void);
 void clear_buttons(void);
-
+void button_debounce_timer_handler(void *p_context);
 #endif
 

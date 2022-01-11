@@ -142,6 +142,7 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
+CFLAGS += -fcommon
 
 # C++ flags common to all targets
 CXXFLAGS += $(OPT)
@@ -165,6 +166,7 @@ LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
+LDFLAGS += -fcommon
 
 nrf52840_xxaa: CFLAGS += -D__HEAP_SIZE=8192
 nrf52840_xxaa: CFLAGS += -D__STACK_SIZE=8192
