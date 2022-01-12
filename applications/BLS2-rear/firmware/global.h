@@ -29,6 +29,9 @@
 
 #include "buttons.h"
 #include "aurora_board.h"
+#include "lis3dh_driver.h"
+#include "lis3dh_defines.h"
+
 
 
 /* TWI instance ID. */
