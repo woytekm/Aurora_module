@@ -12,6 +12,7 @@
 int main(void)
 {
 
+
  SEGGER_RTT_printf(0, "Firmware start\n");
 
  system_init();

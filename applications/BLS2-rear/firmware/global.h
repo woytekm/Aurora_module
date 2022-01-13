@@ -27,7 +27,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "buttons.h"
 #include "aurora_board.h"
+#include "lis3dh_driver.h"
+#include "lis3dh_defines.h"
+
+
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
@@ -47,15 +52,17 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 #define USER_LED_2 NRF_GPIO_PIN_MAP(0,28)
 #define USER_LED_1 NRF_GPIO_PIN_MAP(1,13)
 
-#define MAX_TOUCH_EVENTS 6
+#define MAX_TOUCH_EVENTS 4
 
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;
+app_timer_t *m_button_debounce_timer;
 
 uint16_t m_touch_event_queue[MAX_TOUCH_EVENTS];
 uint8_t m_touch_event_queue_idx;
 bool m_touch_event_in_progress;
 
+bool m_button_debounce_active;
 bool m_light_on;
 
 #define LED_PGMS 3  // coded in pwm.c

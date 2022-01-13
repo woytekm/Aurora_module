@@ -49,8 +49,10 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
   $(SDK_ROOT)/components/libraries/util/app_util_platform.c \
+  $(PROJ_DIR)/buttons.c \
   $(PROJ_DIR)/twi.c \
   $(PROJ_DIR)/mpr121.c \
+  $(PROJ_DIR)/lis3dh_driver.c \
   $(PROJ_DIR)/touch.c \
   $(PROJ_DIR)/init.c \
   $(PROJ_DIR)/main.c \

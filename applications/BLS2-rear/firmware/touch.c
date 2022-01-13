@@ -2,46 +2,15 @@
 #include "touch.h"
 #include "mpr121.h"
 
-void touch_reset_timer_handler(void *p_context)
- {
- 
-   SEGGER_RTT_printf(0, "touch reset: invoked \n");
-   uint8_t reg_addr_04 = 0x04;
-   uint8_t reg_filt_data_lsb = 0x00;
 
-   uint8_t reg_addr_05 = 0x05;
-   uint8_t reg_filt_data_msb = 0x00;
 
-   uint8_t reg_addr_1e = 0x1E;
-   uint8_t reg_baseline = 0x00;
-
-   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_04, sizeof(uint8_t),true);
-   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_filt_data_lsb, sizeof(uint8_t));
-
-   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_05, sizeof(uint8_t),true);
-   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_filt_data_msb, sizeof(uint8_t));
-
-   nrf_drv_twi_tx(&m_twi_0, MPR121_I2C_ADDR, &reg_addr_1e, sizeof(uint8_t),true);
-   nrf_drv_twi_rx(&m_twi_0, MPR121_I2C_ADDR, &reg_baseline, sizeof(uint8_t));
-
-   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_04,reg_filt_data_lsb);
-   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_05,reg_filt_data_msb);
-   SEGGER_RTT_printf(0,"MPR121: reg 0x%X: 0x%X\n",reg_addr_1e,reg_baseline);
-
-   //if(m_GPS_on)
-   // {
-   //   SEGGER_RTT_printf(0, "touch reset: resettig touch controller...%d\n");
-   //   MPR121_off();
-   //   nrf_delay_us(5000);
-   //   MPR121_on_no_baseline();
-   // }
-
- }
 void touch_event_timer_handler(void *p_context)
  {
 
   uint8_t i,event_code;
-  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
+
+#ifdef USE_MPR121
+  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h  - touch controller events
                 {{1,0,0,0,0,0},
                 {2,0,0,0,0,0},
                 {4,0,0,0,0,0},
@@ -54,11 +23,26 @@ void touch_event_timer_handler(void *p_context)
                 {2,0,4,0,2,0},
                 {4,0,4,0,4,0},
                 {2,0,2,0,2,0}};
+#else
+  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h  - tact switch patterns
+                {{8,0,0,0},
+                {20,0,0,0},
+                {10,0,0,0},
+                {8,8,0,0},
+                {20,20,0,0},
+                {10,10,0,0},
+                {8,8,8,0},
+                {20,20,20,0},
+                {10,10,10,0},
+                {0,0,0,0},
+                {0,0,0,0},
+                {0,0,0,0}};
+#endif
 
   SEGGER_RTT_printf(0, "Touch event timer end\n");
 
-  //for(i=0; i<m_touch_event_queue_idx; i++)
-  // SEGGER_RTT_printf(0, " event: %d\n",m_touch_event_queue[i]);
+  for(i=0; i<=m_touch_event_queue_idx; i++)
+   SEGGER_RTT_printf(0, " event: %d\n",m_touch_event_queue[i]);
 
   event_code = 254;
 
@@ -90,7 +74,6 @@ void touch_event_timer_handler(void *p_context)
       SEGGER_RTT_printf(0, "touch event: T_L_DT\n");
       if(!m_GPS_on)
        {
-         MPR121_off();
          GPS_enable();
          nrf_delay_ms(3000);
          //MPR121_init();
@@ -98,11 +81,8 @@ void touch_event_timer_handler(void *p_context)
        }
       else 
        {
-        MPR121_off();
         GPS_disable();
         nrf_delay_us(5000);
-        MPR121_init();
-        MPR121_on_no_baseline();
        }
       break;
 
@@ -145,6 +125,8 @@ void touch_event_timer_handler(void *p_context)
 
  }
 
+#ifdef USE_MPR121
+
 void touch_IRQ_init(void)
  {
     ret_code_t err_code;
@@ -164,3 +146,4 @@ void touch_IRQ_init(void)
     SEGGER_RTT_printf(0, "Touch IRQ init complete.\n");
  }
 
+#endif

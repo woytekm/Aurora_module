@@ -10,6 +10,13 @@ void timer_init(void)
                                touch_event_timer_handler);
   APP_ERROR_CHECK(err_code);
 
+  err_code = app_timer_create(&m_button_debounce_timer,
+                               APP_TIMER_MODE_SINGLE_SHOT,
+                               button_debounce_timer_handler);
+  APP_ERROR_CHECK(err_code);
+
+#ifdef USE_MPR121
+
   err_code = app_timer_create(&m_touch_reset_timer,
                                APP_TIMER_MODE_REPEATED,
                                touch_reset_timer_handler);
@@ -20,6 +27,8 @@ void timer_init(void)
 
   //err_code = app_timer_start(m_touch_reset_timer, TOUCH_RST_TIMER_INTERVAL, NULL);
   APP_ERROR_CHECK(err_code);
+
+#endif
 
  }
 
@@ -47,9 +56,8 @@ static void lfclk_request(void)
 uint8_t system_init(void)
  {
 
-   m_touch_event_in_progress = false;
 
-   twi_init();
+#ifdef  USE_MPR121
 
    if(MPR121_init() == 0)
     {
@@ -59,12 +67,24 @@ uint8_t system_init(void)
    
    nrf_delay_us(5000);
 
-   m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
-   memset(m_touch_event_timer, 0, sizeof(app_timer_t));
-
    m_touch_reset_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_touch_reset_timer, 0, sizeof(app_timer_t));
 
+#else
+
+   m_button_debounce_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+   memset(m_button_debounce_timer, 0, sizeof(app_timer_t));
+   init_buttons();
+
+#endif
+
+   m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+   memset(m_touch_event_timer, 0, sizeof(app_timer_t));
+
+   twi_init();
+
+   m_button_debounce_active = false;
+   m_touch_event_in_progress = false;
    m_led_program = 1;
    m_led_program_duty = 10000;   // step duration
    m_led_program_speed = 3;
@@ -98,5 +118,5 @@ uint8_t system_init(void)
    timer_init();
    SEGGER_RTT_printf(0,"init done.\n");
    return 0;
-
+  
  } 
