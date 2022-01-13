@@ -8,7 +8,23 @@ void touch_event_timer_handler(void *p_context)
  {
 
   uint8_t i,event_code;
-  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h 
+
+#ifdef USE_MPR121
+  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h  - touch controller events
+                {{1,0,0,0,0,0},
+                {2,0,0,0,0,0},
+                {4,0,0,0,0,0},
+                {1,0,1,0,0,0},
+                {2,0,2,0,0,0},
+                {4,0,4,0,0,0},
+                {1,0,4,0,0,0},
+                {1,0,2,0,0,0},
+                {1,0,4,0,1,0},
+                {2,0,4,0,2,0},
+                {4,0,4,0,4,0},
+                {2,0,2,0,2,0}};
+#else
+  uint16_t touch_patterns[TOUCH_PATTERNS][MAX_TOUCH_EVENTS] =  // this should match with touch_events enum from touch.h  - tact switch patterns
                 {{8,0,0,0},
                 {20,0,0,0},
                 {10,0,0,0},
@@ -21,6 +37,7 @@ void touch_event_timer_handler(void *p_context)
                 {0,0,0,0},
                 {0,0,0,0},
                 {0,0,0,0}};
+#endif
 
   SEGGER_RTT_printf(0, "Touch event timer end\n");
 
@@ -108,6 +125,8 @@ void touch_event_timer_handler(void *p_context)
 
  }
 
+#ifdef USE_MPR121
+
 void touch_IRQ_init(void)
  {
     ret_code_t err_code;
@@ -127,3 +146,4 @@ void touch_IRQ_init(void)
     SEGGER_RTT_printf(0, "Touch IRQ init complete.\n");
  }
 
+#endif

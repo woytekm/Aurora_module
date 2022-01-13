@@ -534,6 +534,8 @@ status_t LIS3DH_Get6DPosition(u8_t* val);
 u8_t LIS3DH_ReadReg(u8_t Reg, u8_t* Data);
 u8_t LIS3DH_WriteReg(u8_t Reg, u8_t Data);
 
+void  LIS3DH_test(void);
+
 
 #endif /* __LIS3DH_H */
 

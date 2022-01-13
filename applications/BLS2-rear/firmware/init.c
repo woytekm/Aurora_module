@@ -70,10 +70,13 @@ uint8_t system_init(void)
    m_touch_reset_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_touch_reset_timer, 0, sizeof(app_timer_t));
 
-#endif
+#else
 
    m_button_debounce_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_button_debounce_timer, 0, sizeof(app_timer_t));
+   init_buttons();
+
+#endif
 
    m_touch_event_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_touch_event_timer, 0, sizeof(app_timer_t));
@@ -106,8 +109,6 @@ uint8_t system_init(void)
    nrf_gpio_pin_clear(PIN_GPS_ENA);
 
    UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
-
-   init_buttons();
 
    SEGGER_RTT_printf(0,"lfclk_request()\n");
    lfclk_request();

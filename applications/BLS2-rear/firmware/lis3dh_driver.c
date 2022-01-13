@@ -37,6 +37,10 @@
 *  Envia um byte atrav�s da SPI e retorna um byte recebido pela mesma
 **/
 
+
+/* port to nRF52 I2C routines by woytekm 2022 */
+
+
 u8_t I2C_Mems_Read_Reg (u8_t Reg)
 {
   uint8_t reg_addr = Reg;
