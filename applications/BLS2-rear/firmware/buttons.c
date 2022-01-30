@@ -19,6 +19,8 @@ void button_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
   ret_code_t err_code;
   uint16_t touch_event;
 
+  SEGGER_RTT_printf(0, "button_handler triggered: %d\n",pin);
+
   if(m_button_debounce_active)
    return;
   else
@@ -27,12 +29,9 @@ void button_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
     err_code = app_timer_start(m_button_debounce_timer, APP_TIMER_TICKS(90), NULL);
 
     if(err_code > 0)
-      SEGGER_RTT_printf(0,"touch event timer error (%d)(%X)(%X)\n",err_code,m_touch_event_timer,touch_event_timer_handler);
-    APP_ERROR_CHECK(err_code);
+      SEGGER_RTT_printf(0,"debounce timer error (%d)(%X)(%X)\n",err_code,m_touch_event_timer,touch_event_timer_handler);
 
    }
-
-  SEGGER_RTT_printf(0, "button_handler triggered: %d\n",pin);
 
   if((pin == PIN_BTN1) && (action ==  NRF_GPIOTE_POLARITY_HITOLO))
     {

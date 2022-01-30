@@ -3,7 +3,7 @@ TARGETS          := nrf52840_xxaa
 OUTPUT_DIRECTORY := _build
 
 #SDK_ROOT := ../../../../../..
-SDK_ROOT := /Users/wojtek/Documents/code/nRF52/nRF5SDK160098a08e2/
+SDK_ROOT := /Users/wojtek/Documents/code/nRF52/nRF5_SDK_17.0.2_d674dde
 PROJ_DIR := ../../..
 
 $(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \

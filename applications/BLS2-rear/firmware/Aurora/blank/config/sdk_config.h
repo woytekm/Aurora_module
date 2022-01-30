@@ -48,6 +48,259 @@
 #endif
 // <h> nRF_Core 
 
+
+// <q> NRF_BLOCK_DEV_QSPI_ENABLED  - nrf_block_dev_qspi - QSPI block device
+
+
+#ifndef NRF_BLOCK_DEV_QSPI_ENABLED
+#define NRF_BLOCK_DEV_QSPI_ENABLED 1
+#endif
+
+#ifndef NRFX_QSPI_CONFIG_SCK_DELAY
+#define NRFX_QSPI_CONFIG_SCK_DELAY 10
+#endif
+
+// <o> NRFX_QSPI_CONFIG_XIP_OFFSET - Address offset in the external memory for Execute in Place operation.
+#ifndef NRFX_QSPI_CONFIG_XIP_OFFSET
+#define NRFX_QSPI_CONFIG_XIP_OFFSET 0
+#endif
+
+// <o> NRFX_QSPI_CONFIG_READOC  - Number of data lines and opcode used for reading.
+
+// <0=> FastRead
+// <1=> Read2O
+// <2=> Read2IO
+// <3=> Read4O
+// <4=> Read4IO
+
+#ifndef NRFX_QSPI_CONFIG_READOC
+#define NRFX_QSPI_CONFIG_READOC 0
+#endif
+
+// <o> NRFX_QSPI_CONFIG_WRITEOC  - Number of data lines and opcode used for writing.
+
+// <0=> PP
+// <1=> PP2O
+// <2=> PP4O
+// <3=> PP4IO
+
+#ifndef NRFX_QSPI_CONFIG_WRITEOC
+#define NRFX_QSPI_CONFIG_WRITEOC 0
+#endif
+
+// <o> NRFX_QSPI_CONFIG_ADDRMODE  - Addressing mode.
+
+// <0=> 24bit
+// <1=> 32bit
+
+#ifndef NRFX_QSPI_CONFIG_ADDRMODE
+#define NRFX_QSPI_CONFIG_ADDRMODE 0
+#endif
+
+// <0=> Mode 0
+// <1=> Mode 1
+
+#ifndef NRFX_QSPI_CONFIG_MODE
+#define NRFX_QSPI_CONFIG_MODE 0
+#endif
+
+// <o> NRFX_QSPI_CONFIG_FREQUENCY  - Frequency divider.
+
+// <0=> 32MHz/1
+// <1=> 32MHz/2
+// <2=> 32MHz/3
+// <3=> 32MHz/4
+// <4=> 32MHz/5
+// <5=> 32MHz/6
+// <6=> 32MHz/7
+// <7=> 32MHz/8
+// <8=> 32MHz/9
+// <9=> 32MHz/10
+// <10=> 32MHz/11
+// <11=> 32MHz/12
+// <12=> 32MHz/13
+// <13=> 32MHz/14
+// <14=> 32MHz/15
+// <15=> 32MHz/16
+
+#ifndef NRFX_QSPI_CONFIG_FREQUENCY
+#define NRFX_QSPI_CONFIG_FREQUENCY 4
+#endif
+
+
+
+// <s> NRFX_QSPI_PIN_SCK - SCK pin value.
+#define NRFX_QSPI_PIN_SCK  QSPI_PIN_SCK
+
+// <s> NRFX_QSPI_PIN_CSN - CSN pin value.
+#define NRFX_QSPI_PIN_CSN  QSPI_PIN_CSN
+
+// <s> NRFX_QSPI_PIN_IO0 - IO0 pin value.
+#define NRFX_QSPI_PIN_IO0 QSPI_PIN_IO0
+
+// <s> NRFX_QSPI_PIN_IO1 - IO1 pin value.
+#define NRFX_QSPI_PIN_IO1  QSPI_PIN_IO1
+
+// <s> NRFX_QSPI_PIN_IO2 - IO2 pin value.
+#define NRFX_QSPI_PIN_IO2 QSPI_PIN_IO2
+
+// <s> NRFX_QSPI_PIN_IO3 - IO3 pin value.
+#define NRFX_QSPI_PIN_IO3  QSPI_PIN_IO3
+
+// <o> NRFX_QSPI_CONFIG_IRQ_PRIORITY  - Interrupt priority
+
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
+// <4=> 4
+// <5=> 5
+// <6=> 6
+// <7=> 7
+
+#ifndef NRFX_QSPI_CONFIG_IRQ_PRIORITY
+#define NRFX_QSPI_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// <e> QSPI_ENABLED - nrf_drv_qspi - QSPI peripheral driver - legacy layer
+//==========================================================
+#ifndef QSPI_ENABLED
+#define QSPI_ENABLED 1
+#endif
+// <o> QSPI_CONFIG_SCK_DELAY - tSHSL, tWHSL and tSHWL in number of 16 MHz periods (62.5 ns).  <0-255>
+
+
+#ifndef QSPI_CONFIG_SCK_DELAY
+#define QSPI_CONFIG_SCK_DELAY 5
+#endif
+
+// <o> QSPI_CONFIG_XIP_OFFSET - Address offset in the external memory for Execute in Place operation.
+#ifndef QSPI_CONFIG_XIP_OFFSET
+#define QSPI_CONFIG_XIP_OFFSET 0
+#endif
+
+// <o> QSPI_CONFIG_READOC  - Number of data lines and opcode used for reading.
+
+// <0=> FastRead
+// <1=> Read2O
+// <2=> Read2IO
+// <3=> Read4O
+// <4=> Read4IO
+
+#ifndef QSPI_CONFIG_READOC
+#define QSPI_CONFIG_READOC 0
+#endif
+
+// <o> QSPI_CONFIG_WRITEOC  - Number of data lines and opcode used for writing.
+
+// <0=> PP
+// <1=> PP2O
+// <2=> PP4O
+// <3=> PP4IO
+
+#ifndef QSPI_CONFIG_WRITEOC
+#define QSPI_CONFIG_WRITEOC 0
+#endif
+
+// <o> QSPI_CONFIG_ADDRMODE  - Addressing mode.
+
+// <0=> 24bit
+// <1=> 32bit
+
+#ifndef QSPI_CONFIG_ADDRMODE
+#define QSPI_CONFIG_ADDRMODE 0
+#endif
+
+// <o> QSPI_CONFIG_MODE  - SPI mode.
+
+// <0=> Mode 0
+// <1=> Mode 1
+
+#ifndef QSPI_CONFIG_MODE
+#define QSPI_CONFIG_MODE 0
+#endif
+
+// <o> QSPI_CONFIG_FREQUENCY  - Frequency divider.
+
+// <0=> 32MHz/1
+// <1=> 32MHz/2
+// <2=> 32MHz/3
+// <3=> 32MHz/4
+// <4=> 32MHz/5
+// <5=> 32MHz/6
+// <6=> 32MHz/7
+// <7=> 32MHz/8
+// <8=> 32MHz/9
+// <9=> 32MHz/10
+// <10=> 32MHz/11
+// <11=> 32MHz/12
+// <12=> 32MHz/13
+// <13=> 32MHz/14
+// <14=> 32MHz/15
+// <15=> 32MHz/16
+
+#ifndef QSPI_CONFIG_FREQUENCY
+#define QSPI_CONFIG_FREQUENCY 15
+#endif
+
+
+#define Q_SCK_PIN  7
+#define Q_SIO0_PIN 41
+#define Q_SIO1_PIN 36
+#define Q_SIO2_PIN 17
+#define Q_SIO3_PIN 15
+#define Q_CSN_PIN  12
+
+
+// <s> QSPI_PIN_SCK - SCK pin value.
+#ifndef QSPI_PIN_SCK
+#define QSPI_PIN_SCK Q_SCK_PIN
+#endif
+
+// <s> QSPI_PIN_CSN - CSN pin value.
+#ifndef QSPI_PIN_CSN
+#define QSPI_PIN_CSN Q_CSN_PIN
+#endif
+
+
+// <s> QSPI_PIN_IO0 - IO0 pin value.
+#ifndef QSPI_PIN_IO0
+#define QSPI_PIN_IO0 Q_SIO0_PIN
+#endif
+
+// <s> QSPI_PIN_IO1 - IO1 pin value.
+#ifndef QSPI_PIN_IO1
+#define QSPI_PIN_IO1 Q_SIO1_PIN
+#endif
+
+// <s> QSPI_PIN_IO2 - IO2 pin value.
+#ifndef QSPI_PIN_IO2
+#define QSPI_PIN_IO2 Q_SIO2_PIN
+#endif
+
+// <s> QSPI_PIN_IO3 - IO3 pin value.
+#ifndef QSPI_PIN_IO3
+#define QSPI_PIN_IO3 Q_SIO3_PIN
+#endif
+
+// <o> QSPI_CONFIG_IRQ_PRIORITY  - Interrupt priority
+
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
+// <4=> 4
+// <5=> 5
+// <6=> 6
+// <7=> 7
+
+#ifndef QSPI_CONFIG_IRQ_PRIORITY
+#define QSPI_CONFIG_IRQ_PRIORITY 6
+#endif
+
+// </e>
 //==========================================================
 // <e> NRF_MPU_LIB_ENABLED - nrf_mpu_lib - Module for MPU
 //==========================================================

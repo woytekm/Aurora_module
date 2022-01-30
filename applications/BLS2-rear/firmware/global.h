@@ -19,6 +19,9 @@
 #include "nrf_gpiote.h"
 #include "nrf_drv_gpiote.h"
 
+#include "nrf_atomic.h"
+#include "nrf_drv_power.h"
+
 #include "app_util_platform.h"
 #include "bsp.h"
 
@@ -31,6 +34,20 @@
 #include "aurora_board.h"
 #include "lis3dh_driver.h"
 #include "lis3dh_defines.h"
+
+#include "ff.h"
+#include "diskio_blkdev.h"
+
+#include "app_usbd.h"
+#include "app_usbd_core.h"
+#include "app_usbd_string_desc.h"
+#include "app_usbd_msc.h"
+#include "app_error.h"
+#include "app_timer.h"
+
+#include "nrf_block_dev.h"
+#include "nrf_block_dev_qspi.h"
+#include "nrf_drv_usbd.h"
 
 
 
