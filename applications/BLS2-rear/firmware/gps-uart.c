@@ -286,6 +286,8 @@ void GPS_enable(void)
    nrf_gpio_pin_clear(PIN_GPS_RST);
    nrf_delay_ms(1000);
    nrf_gpio_pin_set(PIN_GPS_RST);
+   nrf_delay_ms(2000);
+   GPS_send_stream("$PMTK513,1*28\r\n",15);
    m_GPS_on = true;
  }
 

@@ -6,6 +6,19 @@
 #include "global.h"
 //#include "ubxmessage.h"
 
+void sync_system_time_to_GPS(void)
+ {
+  G_system_time.tm_sec = G_current_position.time.tm_sec;
+  G_system_time.tm_min = G_current_position.time.tm_min;
+  G_system_time.tm_hour = G_current_position.time.tm_hour;
+ }
+
+void sync_system_date_to_GPS(void)
+ {
+  G_system_time.tm_year = G_GPS_year;
+  G_system_time.tm_mon = G_GPS_month;
+  G_system_time.tm_mday = G_GPS_day;
+ }
 
 char * strdup (const char *s)
 {
@@ -118,10 +131,17 @@ nmea_time_parse(char *s, struct tm *time)
 
   memset(time, 0, sizeof (struct tm));
 
+  //SEGGER_RTT_printf(0,"nmea_time_parse: input string: %s\n",s);
+
   strncpy(hour,s,2);
   strncpy(min,s+2,2);
   strncpy(sec,s+4,2);
   sec[2] = 0x0;
+  hour[2] = 0x0;
+  min[2] = 0x0;
+
+  //SEGGER_RTT_printf(0,"nmea_time_parse: divided string: %s, %s, %s\n",hour,min,sec);
+  //SEGGER_RTT_printf(0,"nmea_time_parse: integers converted: %d, %d, %d\n",atoi(hour),atoi(min),atoi(sec));
 
   time->tm_hour = atoi(hour);
   time->tm_min = atoi(min);
@@ -129,6 +149,8 @@ nmea_time_parse(char *s, struct tm *time)
   time->tm_year = G_GPS_year;
   time->tm_mon = G_GPS_month;
   time->tm_mday = G_GPS_day;
+
+  
 
   return 0;
 }
@@ -210,7 +232,8 @@ void GPS_parse_GPGGA(char *GPGGA_msg)
 #endif
      if((!G_time_synced) && (G_fixes > 10))  // sync time after 5 good GPS fixes
       {
-        //sync_system_time_to_GPS();
+        sync_system_time_to_GPS();
+        sync_system_date_to_GPS();
         G_time_synced = true;
       }
     }

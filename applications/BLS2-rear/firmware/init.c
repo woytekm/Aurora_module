@@ -9,7 +9,6 @@ void timer_init(void)
                                APP_TIMER_MODE_SINGLE_SHOT,
                                touch_event_timer_handler);
   SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
-
   APP_ERROR_CHECK(err_code);
 
   err_code = app_timer_create(&m_button_debounce_timer,
@@ -17,6 +16,26 @@ void timer_init(void)
                                button_debounce_timer_handler);
   SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
   APP_ERROR_CHECK(err_code);
+
+  err_code = app_timer_create(&m_gpx_writer_timer,
+                               APP_TIMER_MODE_REPEATED,
+                               gpx_writer_handler);
+  SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
+  APP_ERROR_CHECK(err_code);
+
+  err_code = app_timer_create(&m_shock_update_timer,
+                               APP_TIMER_MODE_REPEATED,
+                               LIS3DH_update_shock_val2);
+  SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
+  APP_ERROR_CHECK(err_code);
+
+  // subsequent app timers created here
+
+  #define GPX_WRITER_TIMER_INTERVAL APP_TIMER_TICKS(3000)
+  #define SHOCK_UPDATE_TIMER_INTERVAL APP_TIMER_TICKS(500)
+
+  err_code = app_timer_start(m_gpx_writer_timer, GPX_WRITER_TIMER_INTERVAL, NULL);
+  err_code = app_timer_start(m_shock_update_timer, SHOCK_UPDATE_TIMER_INTERVAL, NULL);
 
 #ifdef USE_MPR121
 
@@ -35,12 +54,12 @@ void timer_init(void)
 
  }
 
-static void lfclk_request(void)
+void clk_init(void)
 {
-    //ret_code_t err_code = nrf_drv_clock_init();
-    //SEGGER_RTT_printf(0,"nrf_drv_clock_init(): %d\n",err_code);
-    //APP_ERROR_CHECK(err_code);
-    //nrf_drv_clock_lfclk_request(NULL);
+  ret_code_t err_code = nrf_drv_clock_init();
+  SEGGER_RTT_printf(0,"nrf_drv_clock_init(): %d\n",err_code);
+  APP_ERROR_CHECK(err_code);
+  //nrf_drv_clock_lfclk_request(NULL);
 
   NRF_CLOCK->TASKS_HFCLKSTART = 1;
 
@@ -70,6 +89,15 @@ uint8_t system_init(void)
    m_button_debounce_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
    memset(m_button_debounce_timer, 0, sizeof(app_timer_t));
 
+   m_gpx_writer_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+   memset(m_gpx_writer_timer, 0, sizeof(app_timer_t));
+
+   m_shock_update_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+   memset(m_shock_update_timer, 0, sizeof(app_timer_t));
+
+   // wake up on pending interrupts
+   SCB->SCR |= SCB_SCR_SEVONPEND_Msk;
+
    twi_init();
 
    m_button_debounce_active = false;
@@ -78,6 +106,18 @@ uint8_t system_init(void)
    m_led_program_duty = 10000;   // step duration
    m_led_program_speed = 3;
    m_led_program_brightness = 1; // not used yet
+   m_SPI_mutex = false;
+   m_prev_GPS_state = false;
+
+   G_pos_write_delay = 0;
+ 
+   G_gpx_write_position = false;
+   G_time_synced = false;
+
+   m_shock_val = 0;
+
+   m_X_prev=m_Y_prev=m_Z_prev=0;
+   m_X_factor=m_Y_factor=m_Z_factor=0;
 
    nrf_gpio_cfg_output(PIN_GPS_ENA);
    nrf_gpio_cfg_output(PIN_GPS_RST);
@@ -99,13 +139,11 @@ uint8_t system_init(void)
 
    UART_config(0,PIN_GPS_TXD,0,PIN_GPS_RXD,UART_BAUDRATE_BAUDRATE_Baud38400,false);
 
-   SEGGER_RTT_printf(0,"lfclk_request()\n");
-   lfclk_request();
    SEGGER_RTT_printf(0,"app_timer_init()\n");
    app_timer_init();
    SEGGER_RTT_printf(0,"timer_init()\n");
    timer_init();
-   SEGGER_RTT_printf(0,"init done.\n");
+
 
 #ifdef  USE_MPR121
 

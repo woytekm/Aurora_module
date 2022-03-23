@@ -1153,7 +1153,7 @@ status_t LIS3DH_SetInt1Duration(LIS3DH_Int1Conf_t id) {
 
 
 /*******************************************************************************
-* Function Name  : LIS3DH_FIFOModeEnable
+* Function Name  : LIS3DH_FIFOModeEnable - modified for LIS3DSH
 * Description    : Sets Fifo Modality
 * Input          : LIS3DH_FIFO_DISABLE, LIS3DH_FIFO_BYPASS_MODE, LIS3DH_FIFO_MODE, 
 				   LIS3DH_FIFO_STREAM_MODE, LIS3DH_FIFO_TRIGGER_MODE
@@ -1172,23 +1172,23 @@ status_t LIS3DH_FIFOModeEnable(LIS3DH_FifoMode_t fm) {
     
     if( !LIS3DH_WriteReg(LIS3DH_FIFO_CTRL_REG, value) )           //fifo mode bypass
       return MEMS_ERROR;   
-    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG5, &value) )
+    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG6, &value) )
       return MEMS_ERROR;
     
     value &= 0xBF;    
     
-    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG5, value) )               //fifo disable
+    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG6, value) )               //fifo disable
       return MEMS_ERROR;   
   }
   
   if(fm == LIS3DH_FIFO_BYPASS_MODE)   {  
-    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG5, &value) )
+    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG6, &value) )
       return MEMS_ERROR;
     
     value &= 0xBF;
     value |= MEMS_SET<<LIS3DH_FIFO_EN;
     
-    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG5, value) )               //fifo enable
+    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG6, value) )               //fifo enable
       return MEMS_ERROR;  
     if( !LIS3DH_ReadReg(LIS3DH_FIFO_CTRL_REG, &value) )
       return MEMS_ERROR;
@@ -1201,13 +1201,13 @@ status_t LIS3DH_FIFOModeEnable(LIS3DH_FifoMode_t fm) {
   }
   
   if(fm == LIS3DH_FIFO_MODE)   {
-    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG5, &value) )
+    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG6, &value) )
       return MEMS_ERROR;
     
     value &= 0xBF;
     value |= MEMS_SET<<LIS3DH_FIFO_EN;
     
-    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG5, value) )               //fifo enable
+    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG6, value) )               //fifo enable
       return MEMS_ERROR;  
     if( !LIS3DH_ReadReg(LIS3DH_FIFO_CTRL_REG, &value) )
       return MEMS_ERROR;
@@ -1220,13 +1220,13 @@ status_t LIS3DH_FIFOModeEnable(LIS3DH_FifoMode_t fm) {
   }
   
   if(fm == LIS3DH_FIFO_STREAM_MODE)   {  
-    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG5, &value) )
+    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG6, &value) )
       return MEMS_ERROR;
     
     value &= 0xBF;
     value |= MEMS_SET<<LIS3DH_FIFO_EN;
     
-    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG5, value) )               //fifo enable
+    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG6, value) )               //fifo enable
       return MEMS_ERROR;   
     if( !LIS3DH_ReadReg(LIS3DH_FIFO_CTRL_REG, &value) )
       return MEMS_ERROR;
@@ -1239,13 +1239,13 @@ status_t LIS3DH_FIFOModeEnable(LIS3DH_FifoMode_t fm) {
   }
   
   if(fm == LIS3DH_FIFO_TRIGGER_MODE)   {  
-    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG5, &value) )
+    if( !LIS3DH_ReadReg(LIS3DH_CTRL_REG6, &value) )
       return MEMS_ERROR;
     
     value &= 0xBF;
     value |= MEMS_SET<<LIS3DH_FIFO_EN;
     
-    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG5, value) )               //fifo enable
+    if( !LIS3DH_WriteReg(LIS3DH_CTRL_REG6, value) )               //fifo enable
       return MEMS_ERROR;    
     if( !LIS3DH_ReadReg(LIS3DH_FIFO_CTRL_REG, &value) )
       return MEMS_ERROR;
@@ -1689,27 +1689,179 @@ void LIS3DH_test(void)
  {
    uint8_t response;
    AxesRaw_t acc;
+   uint8_t FIFO_samples;
 
-   SEGGER_RTT_printf(0, "Firmware start\n");
+   int16_t X_prev,Y_prev,Z_prev;
+   int16_t X_factor = 0, Y_factor = 0, Z_factor = 0;
 
-   response = LIS3DH_SetODR(LIS3DH_ODR_100Hz);
-   //set PowerMode
+   uint8_t sample_counter;
+
+   response = LIS3DH_SetODR(LIS3DH_ODR_50Hz);
+
    response = LIS3DH_SetMode(LIS3DH_NORMAL);
-   //set Fullscale
+
    response = LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
-   //set axis Enable
+
+   LIS3DH_SetBDU(MEMS_ENABLE);
+
    response = LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
+
+   response = LIS3DH_FIFOModeEnable(LIS3DH_FIFO_MODE);
+
+   LIS3DH_GetAccAxesRaw(&acc);
+
+   X_prev = acc.AXIS_X;
+   Y_prev = acc.AXIS_Y;
+   Z_prev = acc.AXIS_Z;
+
+#define SENSE 800
 
    while(1)
     {
-     response += LIS3DH_GetAccAxesRaw(&acc);
-     SEGGER_RTT_printf(0,"X:%d, Y:%d, Z:%d\n",acc.AXIS_X,acc.AXIS_Y,acc.AXIS_Z);
+
+     response = LIS3DH_GetFifoSourceFSS(&FIFO_samples);
+     SEGGER_RTT_printf(0,"FIFO samples: %d (%d)\n",FIFO_samples,response);
+
+     for(sample_counter = 0; sample_counter < FIFO_samples; sample_counter++)
+      {
+
+        LIS3DH_GetAccAxesRaw(&acc);
+
+        if(acc.AXIS_X < 0) acc.AXIS_X = acc.AXIS_X * -1;
+        if(acc.AXIS_Y < 0) acc.AXIS_Y = acc.AXIS_Y * -1;
+        if(acc.AXIS_Z < 0) acc.AXIS_Z = acc.AXIS_Z * -1;
+
+        if( ((acc.AXIS_X > X_prev+SENSE) || (acc.AXIS_X < X_prev-SENSE)) || 
+            ((acc.AXIS_Y > Y_prev+SENSE) || (acc.AXIS_Y < Y_prev-SENSE)) ||
+            ((acc.AXIS_Z > Z_prev+SENSE) || (acc.AXIS_Z < Z_prev-SENSE)) )
+          {
+               if(acc.AXIS_X > X_prev)
+                 X_factor += acc.AXIS_X-X_prev;
+               else if(acc.AXIS_X < X_prev)
+                 X_factor = X_prev-acc.AXIS_X;
+
+               if(acc.AXIS_Y > Y_prev)
+                 Y_factor += acc.AXIS_Y-Y_prev;
+               else if(acc.AXIS_Y < Y_prev)
+                 Y_factor += Y_prev-acc.AXIS_Y;
+
+               if(acc.AXIS_Z > Z_prev)
+                 Z_factor = acc.AXIS_Z-Z_prev;
+               else if(acc.AXIS_Z < Z_prev)
+                 Z_factor = Z_prev-acc.AXIS_Z;
+
+          }
+
+        X_prev = acc.AXIS_X;
+        Y_prev = acc.AXIS_Y;
+        Z_prev = acc.AXIS_Z;
+      }
+     if((X_factor||Y_factor||Z_factor)>0)
+       SEGGER_RTT_printf(0,"X:%d, Y:%d, Z:%d\n",X_factor,Y_factor,Z_factor);
+     
+     X_factor=Y_factor=Z_factor = 0;
+
      nrf_delay_ms(500);
     }
 
  }
 
 
+void LIS3DH_update_shock_val(void *p_context)
+ {
+   AxesRaw_t acc;
+
+   if(m_GPS_on)
+   {
+    LIS3DH_GetAccAxesRaw(&acc);
+    if((acc.AXIS_X > 300) || (acc.AXIS_X < -300) || (acc.AXIS_Z > 300) || (acc.AXIS_Z < -300))
+     {
+       SEGGER_RTT_printf(0,"X:%d, Y:%d, Z:%d\n",acc.AXIS_X,acc.AXIS_Y,acc.AXIS_Z);
+       if(acc.AXIS_X<0) acc.AXIS_X = acc.AXIS_X * -1;
+       if(acc.AXIS_Y<0) acc.AXIS_Y = acc.AXIS_Y * -1;
+       if(acc.AXIS_Z<0) acc.AXIS_Z = acc.AXIS_Z * -1;
+       m_shock_val += acc.AXIS_X + acc.AXIS_Y + acc.AXIS_Z;
+       SEGGER_RTT_printf(0,"shock: %d\n",m_shock_val);
+     }
+   } 
+ }
+
+
+void LIS3DH_update_shock_val2(void *p_context)
+ {
+   AxesRaw_t acc;
+   uint8_t FIFO_samples;
+   uint8_t sample_counter;
+
+   if(m_GPS_on == false)
+    return;
+
+   LIS3DH_GetFifoSourceFSS(&FIFO_samples);
+   SEGGER_RTT_printf(0,"FIFO samples: %d\n",FIFO_samples);
+
+   for(sample_counter = 0; sample_counter < FIFO_samples; sample_counter++)
+      {
+
+        LIS3DH_GetAccAxesRaw(&acc);
+
+        if(acc.AXIS_X < 0) acc.AXIS_X = acc.AXIS_X * -1;
+        if(acc.AXIS_Y < 0) acc.AXIS_Y = acc.AXIS_Y * -1;
+        if(acc.AXIS_Z < 0) acc.AXIS_Z = acc.AXIS_Z * -1;
+
+        if( ((acc.AXIS_X > m_X_prev+SHOCK_TRIGGER_LVL) || (acc.AXIS_X < m_X_prev-SHOCK_TRIGGER_LVL)) ||
+            ((acc.AXIS_Y > m_Y_prev+SHOCK_TRIGGER_LVL) || (acc.AXIS_Y < m_Y_prev-SHOCK_TRIGGER_LVL)) ||
+            ((acc.AXIS_Z > m_Z_prev+SHOCK_TRIGGER_LVL) || (acc.AXIS_Z < m_Z_prev-SHOCK_TRIGGER_LVL)) )
+          {
+               if(acc.AXIS_X > m_X_prev)
+                 m_X_factor += acc.AXIS_X-m_X_prev;
+               else if(acc.AXIS_X < m_X_prev)
+                 m_X_factor = m_X_prev-acc.AXIS_X;
+
+               if(acc.AXIS_Y > m_Y_prev)
+                 m_Y_factor += acc.AXIS_Y-m_Y_prev;
+               else if(acc.AXIS_Y < m_Y_prev)
+                 m_Y_factor += m_Y_prev-acc.AXIS_Y;
+
+               if(acc.AXIS_Z > m_Z_prev)
+                 m_Z_factor = acc.AXIS_Z-m_Z_prev;
+               else if(acc.AXIS_Z < m_Z_prev)
+                 m_Z_factor = m_Z_prev-acc.AXIS_Z;
+
+          }
+
+        m_X_prev = acc.AXIS_X;
+        m_Y_prev = acc.AXIS_Y;
+        m_Z_prev = acc.AXIS_Z;
+      }
+
+   if((m_X_factor||m_Y_factor||m_Z_factor)>0)
+     SEGGER_RTT_printf(0,"X:%d, Y:%d, Z:%d\n",m_X_factor,m_Y_factor,m_Z_factor);
+
+   m_shock_val += m_Y_factor;
+
+   m_X_factor=m_Y_factor=m_Z_factor = 0;
+
+ }
+
+void LIS3DH_init(void)
+ {
+   
+   AxesRaw_t acc;
+
+   LIS3DH_SetODR(LIS3DH_ODR_50Hz);
+   LIS3DH_SetMode(LIS3DH_NORMAL);
+   LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
+   LIS3DH_SetBDU(MEMS_ENABLE);
+   LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
+   LIS3DH_FIFOModeEnable(LIS3DH_FIFO_MODE);
+   nrf_delay_ms(500);
+   LIS3DH_GetAccAxesRaw(&acc);
+
+   m_X_prev = acc.AXIS_X;
+   m_Y_prev = acc.AXIS_Y;
+   m_Z_prev = acc.AXIS_Z;
+
+}
 /******************* (C) COPYRIGHT 2012 STMicroelectronics *****END OF FILE****/
 
 

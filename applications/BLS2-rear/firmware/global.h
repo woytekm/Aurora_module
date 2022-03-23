@@ -22,6 +22,8 @@
 #include "nrf_atomic.h"
 #include "nrf_drv_power.h"
 
+#include "nrf_drv_rng.h"
+
 #include "app_util_platform.h"
 #include "bsp.h"
 
@@ -29,11 +31,14 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <strings.h>
 
 #include "buttons.h"
 #include "aurora_board.h"
 #include "lis3dh_driver.h"
 #include "lis3dh_defines.h"
+#include "gpx.h"
+#include "init.h"
 
 #include "ff.h"
 #include "diskio_blkdev.h"
@@ -62,6 +67,7 @@
 static const nrf_drv_twi_t m_twi_0 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_0);
 static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
+#define USB_INIT_WAIT 20
 
 #define TOUCH_IRQ_PIN NRF_GPIO_PIN_MAP(1,10)
 
@@ -71,9 +77,15 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
 #define MAX_TOUCH_EVENTS 4
 
+#define TRACK_FNAME "TRACK.GPX"
+
+#define SHOCK_TRIGGER_LVL 900
+
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;
 app_timer_t *m_button_debounce_timer;
+app_timer_t *m_gpx_writer_timer;
+app_timer_t *m_shock_update_timer;
 
 uint16_t m_touch_event_queue[MAX_TOUCH_EVENTS];
 uint8_t m_touch_event_queue_idx;
@@ -89,6 +101,12 @@ uint8_t m_led_program_speed;
 uint8_t m_led_program_brightness;
 uint16_t m_led_program_duty;
 
+volatile uint8_t m_SPI_mutex;
+
+volatile bool m_prev_GPS_state;
+
+uint8_t G_pos_write_delay;
+
 uint8_t G_fixes;
 uint8_t G_GPS_opMode;
 uint8_t G_GPS_navMode;
@@ -97,6 +115,7 @@ uint8_t G_time_synced;
 uint8_t G_GPS_day;
 uint8_t G_GPS_month;
 uint8_t G_GPS_year;
+struct tm G_system_time;
 uint8_t G_last_UBX_ACK_state;
 bool G_GPS_cmd_sent;
 UBXMsgBuffer G_last_received_UBX_msg;
@@ -104,37 +123,16 @@ enum UBX_ACK_STATE { UBX_ACK, UBX_NAK, UBX_UNKNOWN };
 
 uint8_t G_current_speed;
 
-#define NMEA_TIME_FORMAT        "%H%M%S"
-#define NMEA_TIME_FORMAT_LEN    6
-
-#define NMEA_DATE_FORMAT        "%d%m%y"
-#define NMEA_DATE_FORMAT_LEN    6
-
- typedef struct {
-           double minutes;
-           int degrees;
-  } degmin_position_t;
-
-  typedef struct {
-          struct tm time;
-          degmin_position_t m_longitude;
-          degmin_position_t m_latitude;
-          char nmea_longitude[12];
-          char nmea_latitude[12];
-          double HDOP;
-          int n_satellites;
-          int altitude;
-          char altitude_unit;
- } nmea_gpgga_t;
-
 nmea_gpgga_t G_current_position;
 nmea_gpgga_t G_prev_position;
 
 uint8_t G_logger_buffer_idx;
 
-char *G_current_gpx_filename;
 bool G_gpx_wrote_header;
 bool G_gpx_wrote_footer;
+bool G_gpx_write_position;
+
+char G_current_gpx_filename[30];
 
 typedef struct GPS_settings{
   UBXU1_t lp_mode;
@@ -150,6 +148,10 @@ typedef struct GPS_settings{
 bool m_GPS_on;
 bool m_track_on;
 bool m_track_pause;
+
+uint16_t m_shock_val;
+int16_t m_X_prev,m_Y_prev,m_Z_prev;
+int16_t m_X_factor,m_Y_factor,m_Z_factor;
 
 // prototypes
 

@@ -5,7 +5,8 @@
 #include <stdint.h>
 
 
-#define MEMS_I2C_ADDR  0x1D
+#define MEMS_I2C_ADDR  0x1D  // LIS3DSH
+//#define MEMS_I2C_ADDR  0x19  // LIS3DH
 
 //Registradores do Acelerometro
 #define STATUS_REG_AUX 			0x07

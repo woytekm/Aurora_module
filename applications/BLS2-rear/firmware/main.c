@@ -38,19 +38,46 @@ NRF_BLOCK_DEV_QSPI_DEFINE(
 
 #define MSC_WORKBUFFER_SIZE (1024)
 
-APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
-                        0,
-                        msc_user_ev_handler,
-                        ENDPOINT_LIST(),
-                        BLOCKDEV_LIST(),
-                        MSC_WORKBUFFER_SIZE);
-
 static nrf_atomic_u32_t m_key_events;
 
 static bool m_usb_connected = false;
 
 
 static FATFS m_filesystem;
+
+
+
+static void fatfs_mkfs(void)
+{
+    FRESULT ff_result;
+
+    if (m_usb_connected)
+    {
+        SEGGER_RTT_printf(0,"Unable to operate on filesystem while USB is connected\n");
+        return;
+    }
+
+    SEGGER_RTT_printf(0,"\r\nCreating filesystem...\n");
+    static uint8_t buf[512];
+    ff_result = f_mkfs("", FM_FAT, 1024, buf, sizeof(buf));
+    if (ff_result != FR_OK)
+    {
+        SEGGER_RTT_printf(0,"Mkfs failed (%d).\n",ff_result);
+        return;
+    }
+
+    SEGGER_RTT_printf(0,"Mounting volume...\n");
+    ff_result = f_mount(&m_filesystem, "", 1);
+    if (ff_result != FR_OK)
+    {
+        SEGGER_RTT_printf(0,"Mount failed.\n");
+        return;
+    }
+
+    SEGGER_RTT_printf(0,"Done\n");
+}
+
+
 
 static bool fatfs_init(void)
 {
@@ -74,6 +101,12 @@ static bool fatfs_init(void)
         SEGGER_RTT_printf(0,"Disk initialization failed.\n");
         return false;
     }
+  
+    if(nrf_gpio_pin_read(PIN_BTN1) == 0 )
+     {
+      SEGGER_RTT_printf(0,"Button 1 is pressed - reinitializing internal storage...\n");
+      fatfs_mkfs();
+     }
 
     SEGGER_RTT_printf(0,"Mounting volume...\n");
     ff_result = f_mount(&m_filesystem, "", 1);
@@ -92,38 +125,6 @@ static bool fatfs_init(void)
 
     SEGGER_RTT_printf(0,"Mount successful.\n");
     return true;
-}
-
-
-
-static void fatfs_mkfs(void)
-{
-    FRESULT ff_result;
-
-    if (m_usb_connected)
-    {
-        SEGGER_RTT_printf(0,"Unable to operate on filesystem while USB is connected\n");
-        return;
-    }
-
-    SEGGER_RTT_printf(0,"\r\nCreating filesystem...\n");
-    static uint8_t buf[512];
-    ff_result = f_mkfs("", FM_FAT, 1024, buf, sizeof(buf));
-    if (ff_result != FR_OK)
-    {
-        SEGGER_RTT_printf(0,"Mkfs failed.\n");
-        return;
-    }
-
-    SEGGER_RTT_printf(0,"Mounting volume...\n");
-    ff_result = f_mount(&m_filesystem, "", 1);
-    if (ff_result != FR_OK)
-    {
-        SEGGER_RTT_printf(0,"Mount failed.\n");
-        return;
-    }
-
-    SEGGER_RTT_printf(0,"Done\n");
 }
 
 
@@ -182,7 +183,13 @@ static void fatfs_file_create(void)
 {
     FRESULT ff_result;
     FIL file;
+    UINT bw;
     char filename[16];
+    uint8_t random_vector[4];
+
+    char *text = "Create a context instance (nrf_crypto_rng_context_t) that is valid for as long as the RNG is in use and optionally create a temporary buffer (nrf_crypto_rng_temp_buffer_t) that is only needed during initialization.  Initialize the RNG using nrf_crypto_rng_init after a call to nrf_crypto_init, providing a pointer to the context and a temporary buffer. Create a context instance (nrf_crypto_rng_context_t) that is valid for as long as the RNG is in use and optionally create a temporary buffer (nrf_crypto_rng_temp_buffer_t) that is only needed during initialization.  Initialize the RNG using nrf_crypto_rng_init after a call to nrf_crypto_init, providing a pointer to the context and a temporary buffer.";
+
+    nrf_drv_rng_rand(random_vector, 4);
 
     if (m_usb_connected)
     {
@@ -190,7 +197,7 @@ static void fatfs_file_create(void)
         return;
     }
 
-    (void)snprintf(filename, sizeof(filename), "%08x.txt", rand());
+    (void)snprintf(filename, sizeof(filename), "%08lx.txt", (uint32_t)random_vector);
 
     SEGGER_RTT_printf(0,"Creating random file: %s ...", (uint32_t)filename);
 
@@ -201,6 +208,8 @@ static void fatfs_file_create(void)
         return;
     }
 
+    f_write(&file,text,strlen(text),&bw);
+
     ff_result = f_close(&file);
     if (ff_result != FR_OK)
     {
@@ -209,6 +218,7 @@ static void fatfs_file_create(void)
     }
     NRF_LOG_RAW_INFO("done\r\n");
 }
+
 
 static void fatfs_uninit(void)
 {
@@ -224,6 +234,15 @@ static void msc_user_ev_handler(app_usbd_class_inst_t const * p_inst,
     UNUSED_PARAMETER(event);
 }
 
+
+APP_USBD_MSC_GLOBAL_DEF(m_app_msc,
+                        0,
+                        msc_user_ev_handler,
+                        ENDPOINT_LIST(),
+                        BLOCKDEV_LIST(),
+                        MSC_WORKBUFFER_SIZE);
+
+
 static void usbd_user_ev_handler(app_usbd_event_type_t event)
 {
     switch (event)
@@ -235,25 +254,25 @@ static void usbd_user_ev_handler(app_usbd_event_type_t event)
         case APP_USBD_EVT_STARTED:
             break;
         case APP_USBD_EVT_STOPPED:
-            UNUSED_RETURN_VALUE(fatfs_init());
             app_usbd_disable();
+            NVIC_SystemReset();
             break;
         case APP_USBD_EVT_POWER_DETECTED:
-            SEGGER_RTT_printf(0,"USB power detected");
+            SEGGER_RTT_printf(0,"USB power detected\n");
 
             if (!nrf_drv_usbd_is_enabled())
             {
-                //fatfs_uninit();
+                fatfs_uninit();
                 app_usbd_enable();
             }
             break;
         case APP_USBD_EVT_POWER_REMOVED:
-            SEGGER_RTT_printf(0,"USB power removed");
+            SEGGER_RTT_printf(0,"USB power removed\n");
             app_usbd_stop();
             m_usb_connected = false;
             break;
         case APP_USBD_EVT_POWER_READY:
-            SEGGER_RTT_printf(0,"USB ready");
+            SEGGER_RTT_printf(0,"USB ready\n");
             app_usbd_start();
             m_usb_connected = true;
             break;
@@ -266,19 +285,68 @@ static void bsp_event_callback(bsp_event_t ev)
 {
 }
 
+void logger(void)
+ {
 
+  if(m_prev_GPS_state != m_GPS_on)
+    {
+     if(m_GPS_on)
+      {
+        gpx_write_header(TRACK_FNAME, "BLS2 road surface quality measurements track");
+        SEGGER_RTT_printf(0,"GPX file initialized.\n");
+        G_gpx_wrote_footer = false;
+        G_gpx_wrote_header = true;
+      }
+     else
+      {
+        sprintf(G_current_gpx_filename,"%02d%02d.gpx",G_system_time.tm_hour,G_system_time.tm_min);
+        gpx_write_footer(TRACK_FNAME);
+        f_rename(TRACK_FNAME,G_current_gpx_filename);
+
+        SEGGER_RTT_printf(0,"GPX file closed.\n");
+        G_gpx_wrote_header = false;
+        G_gpx_wrote_footer = true;
+      }
+     m_prev_GPS_state = m_GPS_on;
+    }
+
+  if(((m_GPS_on&&G_gpx_wrote_header) && (G_current_position.n_satellites >= MIN_SATELLITES) && G_gpx_write_position) && (G_pos_write_delay==5) && (G_current_position.HDOP < MIN_V_HDOP))
+   {
+     SEGGER_RTT_printf(0,"gpx_write_header: position appended.\n");
+     gpx_append_position_with_shock(&G_current_position, m_shock_val, TRACK_FNAME);
+     nrf_gpio_pin_set(USER_LED_3);
+     nrf_delay_us(500);
+     nrf_gpio_pin_clear(USER_LED_3);
+     G_gpx_write_position = false;
+     
+   }
+
+  m_shock_val = 0;
+
+  if((G_current_position.n_satellites >= MIN_SATELLITES) && (G_pos_write_delay<5))
+   G_pos_write_delay++;
+
+ }
 
 
 int main(void)
 {
 
  ret_code_t ret;
+ uint8_t usb_timeout = 0;
 
  static const app_usbd_config_t usbd_config = {
      .ev_state_proc = usbd_user_ev_handler
  };
 
+ ret = NRF_LOG_INIT(NULL);
+ APP_ERROR_CHECK(ret);
+ NRF_LOG_DEFAULT_BACKENDS_INIT();
+
  SEGGER_RTT_printf(0, "Firmware start\n");
+
+ SEGGER_RTT_printf(0,"clk_init()\n");
+ clk_init();
 
  ret = app_usbd_init(&usbd_config);
  APP_ERROR_CHECK(ret);
@@ -287,12 +355,25 @@ int main(void)
  ret = app_usbd_class_append(class_inst_msc);
  APP_ERROR_CHECK(ret);
 
- SEGGER_RTT_printf(0, "USBD MSC example started.\n");
+ ret = app_usbd_power_events_enable();
+ APP_ERROR_CHECK(ret);
+
+ SEGGER_RTT_printf(0, "USBD MSC feature started.\n");
+ 
+ while(usb_timeout<USB_INIT_WAIT) {app_usbd_event_queue_process(); nrf_delay_ms(100); usb_timeout++;}
+
+ if(m_usb_connected)
+  {
+   SEGGER_RTT_printf(0, "USB power detected, entering USB drive mode.\n");
+   while(1){app_usbd_event_queue_process();}
+  }
+
+ system_init();
 
  fatfs_init();
  fatfs_ls();
-
- system_init();
+ //LIS3DH_test();
+ LIS3DH_init();
 
  for (;;)
    {   
@@ -304,7 +385,8 @@ int main(void)
         __SEV();
         __WFE();
 
-        NRF_LOG_FLUSH();
+        logger();
+     
         //app_sched_execute();
     }
  

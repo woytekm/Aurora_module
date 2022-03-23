@@ -49,6 +49,9 @@
 // <h> nRF_Core 
 
 
+// make USB mass storage read only for now. Only device can recreate GPX file.
+#define APP_USBD_MSC_STORAGE_RO 1
+
 // <q> NRF_BLOCK_DEV_QSPI_ENABLED  - nrf_block_dev_qspi - QSPI block device
 
 
@@ -4350,7 +4353,7 @@
 // <7=> 7 
 
 #ifndef NRFX_USBD_CONFIG_IRQ_PRIORITY
-#define NRFX_USBD_CONFIG_IRQ_PRIORITY 6
+#define NRFX_USBD_CONFIG_IRQ_PRIORITY 3
 #endif
 
 // <o> NRFX_USBD_CONFIG_DMASCHEDULER_MODE  - USBD DMA scheduler working scheme
@@ -5701,7 +5704,7 @@
 // <7=> 7 
 
 #ifndef USBD_CONFIG_IRQ_PRIORITY
-#define USBD_CONFIG_IRQ_PRIORITY 6
+#define USBD_CONFIG_IRQ_PRIORITY 3
 #endif
 
 // <o> USBD_CONFIG_DMASCHEDULER_MODE  - USBD SMA scheduler working scheme
@@ -6009,6 +6012,7 @@
 #ifndef APP_USBD_ENABLED
 #define APP_USBD_ENABLED 1
 #endif
+
 // <s> APP_USBD_VID - Vendor ID.
 
 // <i> Note: This value is not editable in Configuration Wizard.
@@ -6121,7 +6125,7 @@
 // <i> This means that it works even if the logging in this very module is disabled. 
 
 #ifndef APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE
-#define APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE 0
+#define APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE 1
 #endif
 
 // <o> APP_USBD_CONFIG_DESC_STRING_SIZE - Maximum size of the NULL-terminated string of the string descriptor.  <31-254> 
@@ -6176,7 +6180,7 @@
 // <i> Setting string to NULL disables that string.
 // <i> The order of manufacturer names must be the same like in @ref APP_USBD_STRINGS_LANGIDS.
 #ifndef APP_USBD_STRINGS_MANUFACTURER
-#define APP_USBD_STRINGS_MANUFACTURER APP_USBD_STRING_DESC("Nordic Semiconductor")
+#define APP_USBD_STRINGS_MANUFACTURER APP_USBD_STRING_DESC("woytekm")
 #endif
 
 // </e>
@@ -6200,7 +6204,7 @@
 // <i> Note: This value is not editable in Configuration Wizard.
 // <i> List of product names that is defined the same way like in @ref APP_USBD_STRINGS_MANUFACTURER.
 #ifndef APP_USBD_STRINGS_PRODUCT
-#define APP_USBD_STRINGS_PRODUCT APP_USBD_STRING_DESC("nRF52 USB Product")
+#define APP_USBD_STRINGS_PRODUCT APP_USBD_STRING_DESC("BLS2 rear light HW v.3")
 #endif
 
 // </e>
@@ -6326,6 +6330,12 @@
 #ifndef APP_USBD_MSC_ENABLED
 #define APP_USBD_MSC_ENABLED 1
 #endif
+
+
+#ifndef APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE
+#define APP_USBD_CONFIG_SOF_TIMESTAMP_PROVIDE 1
+#endif
+
 
 // <q> CRC16_ENABLED  - crc16 - CRC16 calculation routines
  
@@ -7331,7 +7341,7 @@
  
 
 #ifndef NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED
-#define NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED 1
+#define NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED 0
 #endif
 
 // <q> NRF_FPRINTF_DOUBLE_ENABLED  - Enable IEEE-754 double precision formatting.
@@ -7353,7 +7363,7 @@
 // <e> NRF_LOG_ENABLED - nrf_log - Logger
 //==========================================================
 #ifndef NRF_LOG_ENABLED
-#define NRF_LOG_ENABLED 0
+#define NRF_LOG_ENABLED 1
 #endif
 // <h> Log message pool - Configuration of log message pool
 
@@ -7434,7 +7444,7 @@
 // <i> Log data is buffered and can be processed in idle.
 
 #ifndef NRF_LOG_DEFERRED
-#define NRF_LOG_DEFERRED 1
+#define NRF_LOG_DEFERRED 0
 #endif
 
 // <q> NRF_LOG_FILTERS_ENABLED  - Enable dynamic filtering of logs.
@@ -7975,7 +7985,7 @@
 // <e> NRFX_USBD_CONFIG_LOG_ENABLED - Enable logging in the module
 //==========================================================
 #ifndef NRFX_USBD_CONFIG_LOG_ENABLED
-#define NRFX_USBD_CONFIG_LOG_ENABLED 0
+#define NRFX_USBD_CONFIG_LOG_ENABLED 1
 #endif
 // <o> NRFX_USBD_CONFIG_LOG_LEVEL  - Default Severity level
  
@@ -7986,7 +7996,7 @@
 // <4=> Debug 
 
 #ifndef NRFX_USBD_CONFIG_LOG_LEVEL
-#define NRFX_USBD_CONFIG_LOG_LEVEL 3
+#define NRFX_USBD_CONFIG_LOG_LEVEL 4
 #endif
 
 // <o> NRFX_USBD_CONFIG_INFO_COLOR  - ANSI escape code prefix.
@@ -8696,7 +8706,7 @@
 // <e> USBD_CONFIG_LOG_ENABLED - Enable logging in the module
 //==========================================================
 #ifndef USBD_CONFIG_LOG_ENABLED
-#define USBD_CONFIG_LOG_ENABLED 0
+#define USBD_CONFIG_LOG_ENABLED 1
 #endif
 // <o> USBD_CONFIG_LOG_LEVEL  - Default Severity level
  
@@ -8707,7 +8717,7 @@
 // <4=> Debug 
 
 #ifndef USBD_CONFIG_LOG_LEVEL
-#define USBD_CONFIG_LOG_LEVEL 3
+#define USBD_CONFIG_LOG_LEVEL 4
 #endif
 
 // <o> USBD_CONFIG_INFO_COLOR  - ANSI escape code prefix.
@@ -9040,7 +9050,7 @@
 // <e> APP_USBD_DUMMY_CONFIG_LOG_ENABLED - Enables logging in the module.
 //==========================================================
 #ifndef APP_USBD_DUMMY_CONFIG_LOG_ENABLED
-#define APP_USBD_DUMMY_CONFIG_LOG_ENABLED 0
+#define APP_USBD_DUMMY_CONFIG_LOG_ENABLED 1
 #endif
 // <o> APP_USBD_DUMMY_CONFIG_LOG_LEVEL  - Default Severity level
  
@@ -9051,7 +9061,7 @@
 // <4=> Debug 
 
 #ifndef APP_USBD_DUMMY_CONFIG_LOG_LEVEL
-#define APP_USBD_DUMMY_CONFIG_LOG_LEVEL 3
+#define APP_USBD_DUMMY_CONFIG_LOG_LEVEL 4
 #endif
 
 // <o> APP_USBD_DUMMY_CONFIG_INFO_COLOR  - ANSI escape code prefix.
@@ -9134,7 +9144,7 @@
 // <8=> White 
 
 #ifndef APP_USBD_MSC_CONFIG_DEBUG_COLOR
-#define APP_USBD_MSC_CONFIG_DEBUG_COLOR 0
+#define APP_USBD_MSC_CONFIG_DEBUG_COLOR 6
 #endif
 
 // </e>
@@ -10313,7 +10323,7 @@
 // <e> NRF_LOG_BACKEND_RTT_ENABLED - nrf_log_backend_rtt - Log RTT backend^M
 //==========================================================^M
 #ifndef NRF_LOG_BACKEND_RTT_ENABLED
-#define NRF_LOG_BACKEND_RTT_ENABLED 0
+#define NRF_LOG_BACKEND_RTT_ENABLED 1
 #endif
 // <o> NRF_LOG_BACKEND_RTT_TEMP_BUFFER_SIZE - Size of buffer for partially processed strings. ^M
 // <i> Size of the buffer is a trade-off between RAM usage and processing.^M

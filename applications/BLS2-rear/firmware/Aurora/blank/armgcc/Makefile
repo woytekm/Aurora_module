@@ -13,6 +13,10 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52840.S \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_frontend.c \
   $(SDK_ROOT)/components/libraries/log/src/nrf_log_str_formatter.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_default_backends.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_rtt.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_serial.c \
+  $(SDK_ROOT)/components/libraries/log/src/nrf_log_backend_uart.c \
   $(SDK_ROOT)/components/boards/boards.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
   $(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
@@ -23,12 +27,15 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/util/app_util_platform.c \
   $(SDK_ROOT)/components/libraries/util/nrf_assert.c \
   $(SDK_ROOT)/components/libraries/atomic/nrf_atomic.c \
+  $(SDK_ROOT)/components/libraries/queue/nrf_queue.c \
   $(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf.c \
   $(SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
   $(SDK_ROOT)/components/libraries/atomic_fifo/nrf_atfifo.c \
   $(SDK_ROOT)/components/libraries/memobj/nrf_memobj.c \
   $(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
+  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_rng.c \
+  $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_rng.c \
   $(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
   $(SDK_ROOT)/modules/nrfx/soc/nrfx_atomic.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_pwm.c \
@@ -80,6 +87,7 @@ SRC_FILES += \
   $(PROJ_DIR)/pwm.c \
   $(PROJ_DIR)/gps-uart.c \
   $(PROJ_DIR)/gps-input.c \
+  $(PROJ_DIR)/gpx.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   #$(SDK_ROOT)/components/libraries/bsp/bsp.c \
@@ -89,6 +97,9 @@ INC_FOLDERS += \
   $(SDK_ROOT)/components \
   $(SDK_ROOT)/modules/nrfx/mdk \
   $(PROJ_DIR) \
+  $(SDK_ROOT)/components/libraries/queue \
+  $(SDK_ROOT)/components/libraries/cli \
+  $(SDK_ROOT)/components/libraries/fds \
   $(SDK_ROOT)/external/fatfs/port \
   $(SDK_ROOT)/external/fatfs/src \
   $(SDK_ROOT)/components/libraries/block_dev/qspi \
@@ -248,3 +259,18 @@ run_jlink:
 
 run_rtt:
 	JLinkRTTClient
+
+run_jlink_gdb:
+	JLinkGDBServerCL -device nrf52840_xxaa -if swd -port 2331
+
+# /System/Volumes/Data/Applications/ARM/bin/arm-none-eabi-gdb
+# 
+# file _build/nrf52840_xxaa.out
+# target remote localhost:2331
+# mon reset 0
+# break main.c:<line_number>
+# c - to go to breakpoint
+# s - to step from breakpoint
+# st - to see stack trace when code hits hardFault 
+# 
+##

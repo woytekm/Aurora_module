@@ -75,9 +75,12 @@ void touch_event_timer_handler(void *p_context)
       if(!m_GPS_on)
        {
          GPS_enable();
+         nrf_delay_ms(100);
+#ifdef USE_MPR121
          nrf_delay_ms(3000);
-         //MPR121_init();
+         MPR121_init();
          MPR121_on_no_baseline();
+#endif
        }
       else 
        {
