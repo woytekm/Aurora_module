@@ -45,7 +45,6 @@
 #include "init.h"
 #include "hwconfig.h"
 #include "touch.h"
-#include "adc.h"
 
 #include "ff.h"
 #include "diskio_blkdev.h"

@@ -1,0 +1,8 @@
+- convert GPX using script in this directory to datapoints: longitide,latitude,shock
+- upload: https://www.gpsvisualizer.com/map_input
+- set data point options:
+- colorize using custom field "shock"
+- min 0 , max 13000 (check GPX for max shock value)
+- spectrum direction UP, Hue 1: 120, Hue 2: 0
+- resize using custom field "shock"
+

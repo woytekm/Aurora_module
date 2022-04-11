@@ -390,11 +390,11 @@ int main(void)
 {
 
  ret_code_t ret;
- uint8_t usb_timeout = 0;
+ //uint8_t usb_timeout = 0;
 
- static const app_usbd_config_t usbd_config = {
-     .ev_state_proc = usbd_user_ev_handler
- };
+ //static const app_usbd_config_t usbd_config = {
+ //    .ev_state_proc = usbd_user_ev_handler
+ //};
 
  ret = NRF_LOG_INIT(NULL);
  APP_ERROR_CHECK(ret);
@@ -431,32 +431,32 @@ int main(void)
 
  nrf_gpio_cfg_output(USER_LED_2);
 
- ret = app_usbd_init(&usbd_config);
- APP_ERROR_CHECK(ret);
+// ret = app_usbd_init(&usbd_config);
+// APP_ERROR_CHECK(ret);
 
- app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
- ret = app_usbd_class_append(class_inst_msc);
- APP_ERROR_CHECK(ret);
+// app_usbd_class_inst_t const * class_inst_msc = app_usbd_msc_class_inst_get(&m_app_msc);
+// ret = app_usbd_class_append(class_inst_msc);
+// APP_ERROR_CHECK(ret);
 
- ret = app_usbd_power_events_enable();
- APP_ERROR_CHECK(ret);
+// ret = app_usbd_power_events_enable();
+// APP_ERROR_CHECK(ret);
 
- SEGGER_RTT_printf(0, "USBD MSC feature started.\n");
+// SEGGER_RTT_printf(0, "USBD MSC feature started.\n");
  
- while(usb_timeout<USB_INIT_WAIT) {app_usbd_event_queue_process(); nrf_delay_ms(100); usb_timeout++;}
+// while(usb_timeout<USB_INIT_WAIT) {app_usbd_event_queue_process(); nrf_delay_ms(100); usb_timeout++;}
 
- if(m_usb_connected)
-  {
-   SEGGER_RTT_printf(0, "USB power detected, entering USB drive mode.\n");
-   while(1){app_usbd_event_queue_process();}
-  }
+// if(m_usb_connected)
+//  {
+//   SEGGER_RTT_printf(0, "USB power detected, entering USB drive mode.\n");
+//   while(1){app_usbd_event_queue_process();}
+//  }
 
  system_init();
 
- fatfs_init();
- fatfs_ls();
+ //fatfs_init();
+ //fatfs_ls();
  //LIS3DH_test();
- LIS3DH_init();
+ //LIS3DH_init();
 
  for (;;)
    {   
