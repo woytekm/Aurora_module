@@ -183,6 +183,8 @@ void light_stop(void);
 
 void led_timer_handler(void *p_context);
 
+void blink_led(uint16_t GPIO);
+
 void GPS_enable(void);
 void GPS_disable(void);
 

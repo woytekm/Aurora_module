@@ -169,6 +169,10 @@ uint8_t system_init(void)
 
    SEGGER_RTT_printf(0,"init done.\n");
 
+   blink_led(USER_LED_1);
+   blink_led(USER_LED_2);
+   blink_led(USER_LED_3);
+
    return 0;
   
  } 

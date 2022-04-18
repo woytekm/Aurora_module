@@ -61,24 +61,9 @@ SRC_FILES += \
   $(SDK_ROOT)/components/libraries/timer/app_timer.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_clock.c \
   $(SDK_ROOT)/components/libraries/util/app_util_platform.c \
-  $(SDK_ROOT)/external/fatfs/port/diskio_blkdev.c \
-  $(SDK_ROOT)/external/fatfs/src/ff.c \
   $(SDK_ROOT)/modules/nrfx/mdk/system_nrf52840.c \
-  $(SDK_ROOT)/external/utf_converter/utf.c \
-  $(SDK_ROOT)/components/libraries/block_dev/empty/nrf_block_dev_empty.c \
-  $(PROJ_DIR)/nrf_block_dev_qspi.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_qspi.c \
-  $(SDK_ROOT)/components/libraries/block_dev/ram/nrf_block_dev_ram.c \
-  $(SDK_ROOT)/external/fatfs/port/diskio_blkdev.c \
-  $(SDK_ROOT)/external/fatfs/src/ff.c \
-  $(SDK_ROOT)/components/libraries/usbd/app_usbd.c \
-  $(SDK_ROOT)/components/libraries/usbd/app_usbd_core.c \
-  $(SDK_ROOT)/components/libraries/usbd/class/msc/app_usbd_msc.c \
-  $(SDK_ROOT)/components/libraries/usbd/app_usbd_string_desc.c \
   $(SDK_ROOT)/integration/nrfx/legacy/nrf_drv_ppi.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_ppi.c \
-  $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_usbd.c \
-  $(PROJ_DIR)/nrf_serial_flash_params.c \
   $(PROJ_DIR)/buttons.c \
   $(PROJ_DIR)/twi.c \
   $(PROJ_DIR)/mpr121.c \
@@ -87,13 +72,7 @@ SRC_FILES += \
   $(PROJ_DIR)/init.c \
   $(PROJ_DIR)/main.c \
   $(PROJ_DIR)/pwm.c \
-  $(PROJ_DIR)/gps-uart.c \
-  $(PROJ_DIR)/gps-input.c \
-  $(PROJ_DIR)/gpx.c \
   $(PROJ_DIR)/adc.c \
-  #$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
-  #$(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
-  #$(SDK_ROOT)/components/libraries/bsp/bsp.c \
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -184,7 +163,7 @@ CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
 CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
-CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing -Wno-unused-function
+CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing -Wno-unused-function -Wno-unused-variable
 CFLAGS += -fno-builtin -fshort-enums
 CFLAGS += -fcommon
 

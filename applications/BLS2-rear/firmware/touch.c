@@ -2,6 +2,12 @@
 #include "touch.h"
 #include "mpr121.h"
 
+void blink_led(uint16_t GPIO)
+ {
+   nrf_gpio_pin_set(GPIO);
+   nrf_delay_ms(100);
+   nrf_gpio_pin_clear(GPIO);
+ }
 
 
 void touch_event_timer_handler(void *p_context)
@@ -54,6 +60,7 @@ void touch_event_timer_handler(void *p_context)
    {
      case T_L:
       SEGGER_RTT_printf(0, "touch event: T_L\n");
+      blink_led(USER_LED_2);
       break;
 
      case T_M:
@@ -64,10 +71,12 @@ void touch_event_timer_handler(void *p_context)
         m_led_program_duty += 1000;
         light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
        }
+      blink_led(USER_LED_2);
       break;
 
      case T_R:
       SEGGER_RTT_printf(0, "touch event: T_R\n");
+      blink_led(USER_LED_2);
       break;
 
      case T_L_DT:
@@ -87,6 +96,7 @@ void touch_event_timer_handler(void *p_context)
         GPS_disable();
         nrf_delay_us(5000);
        }
+      blink_led(USER_LED_2);
       break;
 
      case T_M_DT:
@@ -97,6 +107,7 @@ void touch_event_timer_handler(void *p_context)
         m_led_program_duty -= 1000;
         light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
        }
+      blink_led(USER_LED_2);
       break;
 
      case T_M_TT:
@@ -109,16 +120,21 @@ void touch_event_timer_handler(void *p_context)
         light_stop();
         light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
        }
+      blink_led(USER_LED_2);
       break;
 
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
-      light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+      if(!m_light_on)
+        light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+      else
+        light_stop();
+      blink_led(USER_LED_2);
       break;
 
      case T_R_TT:
       SEGGER_RTT_printf(0, "touch event: T_R_TT\n");
-      light_stop();
+      blink_led(USER_LED_2);
       break;
 
    }

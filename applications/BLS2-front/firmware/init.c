@@ -16,11 +16,8 @@ void timer_init(void)
   memset(m_button_debounce_timer, 0, sizeof(app_timer_t));
 #endif
 
-//  m_gpx_writer_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
-//  memset(m_gpx_writer_timer, 0, sizeof(app_timer_t));
-
-//  m_shock_update_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
-//  memset(m_shock_update_timer, 0, sizeof(app_timer_t));
+  m_headlight_flash_timer = (app_timer_t *) malloc(sizeof(app_timer_t));
+  memset(m_headlight_flash_timer, 0, sizeof(app_timer_t));
 
   err_code = app_timer_create(&m_touch_event_timer,
                                APP_TIMER_MODE_SINGLE_SHOT,
@@ -36,25 +33,16 @@ void timer_init(void)
   APP_ERROR_CHECK(err_code);
 #endif
 
-//  err_code = app_timer_create(&m_gpx_writer_timer,
-//                               APP_TIMER_MODE_REPEATED,
-//                               gpx_writer_handler);
-//  SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
-//  APP_ERROR_CHECK(err_code);
+  err_code = app_timer_create(&m_headlight_flash_timer,
+                               APP_TIMER_MODE_REPEATED,
+                               headlight_flash_handler);
+  SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
+  APP_ERROR_CHECK(err_code);
 
-//  err_code = app_timer_create(&m_shock_update_timer,
-//                               APP_TIMER_MODE_REPEATED,
-//                               LIS3DH_update_shock_val2);
-//  SEGGER_RTT_printf(0,"timer create code %d\n",err_code);
-//  APP_ERROR_CHECK(err_code);
 
-  // subsequent app timers created here
+  #define HEADLIGHT_FLASH_TIMER_INTERVAL APP_TIMER_TICKS(2000)
 
-  #define GPX_WRITER_TIMER_INTERVAL APP_TIMER_TICKS(3000)
-  #define SHOCK_UPDATE_TIMER_INTERVAL APP_TIMER_TICKS(500)
-
-//  err_code = app_timer_start(m_gpx_writer_timer, GPX_WRITER_TIMER_INTERVAL, NULL);
-//  err_code = app_timer_start(m_shock_update_timer, SHOCK_UPDATE_TIMER_INTERVAL, NULL);
+ err_code = app_timer_start(m_headlight_flash_timer, HEADLIGHT_FLASH_TIMER_INTERVAL, NULL);
 
 #ifdef USE_MPR121
 
@@ -105,21 +93,19 @@ uint8_t system_init(void)
    m_button_debounce_active = false;
    m_touch_event_in_progress = false;
    m_led_program = 1;
-   m_led_program_duty = 10000;   // step duration
+   m_led_program_duty = 50;   // step duration
    m_led_program_speed = 3;
    m_led_program_brightness = 1; // not used yet
    m_SPI_mutex = false;
-   m_prev_GPS_state = false;
    m_led_steps[0] = USER_LED_1;
    m_led_steps[1] = USER_LED_2;
    m_led_steps[2] = USER_LED_3;
 
-   G_pos_write_delay = 0;
- 
-   G_gpx_write_position = false;
-   G_time_synced = false;
-
    m_shock_val = 0;
+   m_light_on = false;
+   m_headlight_duty_cycle = 80;
+
+   m_light_mode = LIGHT_CONSTANT;
 
    m_X_prev=m_Y_prev=m_Z_prev=0;
    m_X_factor=m_Y_factor=m_Z_factor=0;
@@ -134,7 +120,9 @@ uint8_t system_init(void)
    nrf_gpio_cfg_output(PIN_J33_08);
    nrf_gpio_cfg_output(PIN_J33_10);
    nrf_gpio_cfg_output(NRF_GPIO_PIN_MAP(0,29));
-  
+ 
+   nrf_gpio_pin_clear(PIN_BRD_LED); 
+
    nrf_gpio_pin_clear(PIN_J33_08);
    nrf_gpio_pin_clear(PIN_J33_10);                   
    nrf_gpio_pin_clear(NRF_GPIO_PIN_MAP(0,29));
@@ -162,6 +150,12 @@ uint8_t system_init(void)
    init_buttons();
 
 #endif
+
+   SEGGER_RTT_printf(0,"adc_init()\n");
+   adc_init();
+
+   SEGGER_RTT_printf(0,"pwm_init()\n");
+   pwm_init();
 
    SEGGER_RTT_printf(0,"init done.\n");
 

@@ -56,14 +56,6 @@ uint8_t  MPR121_off(void)
 void touch_reset_timer_handler(void *p_context)
  {
 
-   if(m_GPS_on)
-    {
-      SEGGER_RTT_printf(0, "touch reset: resettig touch controller...%d\n");
-      MPR121_off();
-      nrf_delay_us(5000);
-      MPR121_on_no_baseline();
-    }
-
  }
 
 

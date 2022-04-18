@@ -5,7 +5,7 @@
 void blink_led(uint16_t GPIO)
  {
    nrf_gpio_pin_set(GPIO);
-   nrf_delay_ms(200);
+   nrf_delay_ms(100);
    nrf_gpio_pin_clear(GPIO);
  }
 
@@ -64,11 +64,10 @@ void touch_event_timer_handler(void *p_context)
 
      case T_M:
       SEGGER_RTT_printf(0, "touch event: T_M\n");
-      if(m_light_on && (m_led_program_duty < 60000))
+      if(m_light_on && (m_headlight_duty_cycle > 0))
        {
-        light_stop();
-        m_led_program_duty += 1000;
-        light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+        m_headlight_duty_cycle -= 20;
+        pwm_update_duty_cycle(m_headlight_duty_cycle);
        }
       blink_led(USER_LED_2);
       break;
@@ -85,11 +84,10 @@ void touch_event_timer_handler(void *p_context)
 
      case T_M_DT:
       SEGGER_RTT_printf(0, "touch event: T_M_DT\n");
-      if(m_light_on && (m_led_program_duty < 60000))
+      if(m_light_on && (m_headlight_duty_cycle < 120))
        {
-        //light_stop();
-        //m_led_program_duty -= 1000;
-        //light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+        m_headlight_duty_cycle += 20;
+        pwm_update_duty_cycle(m_headlight_duty_cycle);
        }
       blink_led(USER_LED_2);
       break;
@@ -98,43 +96,28 @@ void touch_event_timer_handler(void *p_context)
       SEGGER_RTT_printf(0, "touch event: T_M_TT\n");
       if(m_light_on)
        {
-        //if(m_led_program == LED_PGMS)
-        //  m_led_program = 1;
-        //else m_led_program++;
-        //light_stop();
-        //light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+        if(m_light_mode == LIGHT_CONSTANT)
+         switch_light_mode(LIGHT_FLASHING);
+        else 
+         switch_light_mode(LIGHT_CONSTANT);
        }
       blink_led(USER_LED_2);
       break;
 
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
-      //light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
       if(!m_light_on)
-       {
-         nrf_gpio_pin_set(PIN_J33_08);
-         nrf_gpio_pin_set(PIN_J33_10);
-         nrf_gpio_pin_set(NRF_GPIO_PIN_MAP(0,29));
-         m_light_on = true;
-       }
+        light_start();
       else
-       {
-         nrf_gpio_pin_clear(PIN_J33_08);
-         nrf_gpio_pin_clear(PIN_J33_10);
-         nrf_gpio_pin_clear(NRF_GPIO_PIN_MAP(0,29));
-         m_light_on = false;
-       }
+        light_stop();
       blink_led(USER_LED_2);
       break;
 
      case T_R_TT:
       SEGGER_RTT_printf(0, "touch event: T_R_TT\n");
-      //light_stop();
       blink_led(USER_LED_2);
       break;
 
-     default:
-      blink_led(USER_LED_3);
    }
 
   m_touch_event_in_progress = false;

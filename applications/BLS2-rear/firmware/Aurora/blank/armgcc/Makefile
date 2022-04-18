@@ -79,6 +79,7 @@ SRC_FILES += \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_ppi.c \
   $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_usbd.c \
   $(PROJ_DIR)/nrf_serial_flash_params.c \
+  $(PROJ_DIR)/adc.c \
   $(PROJ_DIR)/buttons.c \
   $(PROJ_DIR)/twi.c \
   $(PROJ_DIR)/mpr121.c \
@@ -90,7 +91,6 @@ SRC_FILES += \
   $(PROJ_DIR)/gps-uart.c \
   $(PROJ_DIR)/gps-input.c \
   $(PROJ_DIR)/gpx.c \
-  $(PROJ_DIR)/adc.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_uarte.c \
   #$(SDK_ROOT)/modules/nrfx/drivers/src/prs/nrfx_prs.c \
   #$(SDK_ROOT)/components/libraries/bsp/bsp.c \
