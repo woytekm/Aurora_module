@@ -99,6 +99,10 @@ void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
         m_battery_level = batt_avg / SAMPLES_IN_BUFFER;
         SEGGER_RTT_printf(0,"battery level: %d\n", m_battery_level);
 
+        uint8_t battery_level = m_battery_level - 123;
+        if(battery_level < ALERT_BATT_LEVEL)
+          blink_led(USER_LED_3,5); 
+
         m_adc_evt_counter++;
     }
 }

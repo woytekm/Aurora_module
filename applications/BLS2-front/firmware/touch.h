@@ -49,6 +49,6 @@ enum touch_events
 
 #endif
 
-void blink_led(uint16_t GPIO);
+void blink_led(uint16_t GPIO,uint8_t times);
 
 #endif 

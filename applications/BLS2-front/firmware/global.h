@@ -67,6 +67,7 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 #define USER_LED_2 NRF_GPIO_PIN_MAP(0,28)
 #define USER_LED_1 NRF_GPIO_PIN_MAP(1,13)
 
+#define ALERT_BATT_LEVEL 30
 
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;

@@ -85,6 +85,8 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 
 #define SHOCK_TRIGGER_LVL 900
 
+#define ALERT_BATT_LEVEL 30
+
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;
 app_timer_t *m_button_debounce_timer;
@@ -183,7 +185,9 @@ void light_stop(void);
 
 void led_timer_handler(void *p_context);
 
-void blink_led(uint16_t GPIO);
+void blink_led(uint16_t GPIO,uint8_t times);
+
+void logger(void);
 
 void GPS_enable(void);
 void GPS_disable(void);

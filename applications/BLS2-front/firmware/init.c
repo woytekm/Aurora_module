@@ -40,7 +40,7 @@ void timer_init(void)
   APP_ERROR_CHECK(err_code);
 
 
-  #define HEADLIGHT_FLASH_TIMER_INTERVAL APP_TIMER_TICKS(2000)
+  #define HEADLIGHT_FLASH_TIMER_INTERVAL APP_TIMER_TICKS(1400)
 
  err_code = app_timer_start(m_headlight_flash_timer, HEADLIGHT_FLASH_TIMER_INTERVAL, NULL);
 
@@ -159,9 +159,9 @@ uint8_t system_init(void)
 
    SEGGER_RTT_printf(0,"init done.\n");
 
-   blink_led(USER_LED_1);
-   blink_led(USER_LED_2);
-   blink_led(USER_LED_3);
+   blink_led(USER_LED_1,1);
+   blink_led(USER_LED_2,1);
+   blink_led(USER_LED_3,1);
 
    return 0;
   

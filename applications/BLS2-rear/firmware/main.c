@@ -187,7 +187,7 @@ static void fatfs_file_create(void)
     char filename[16];
     uint8_t random_vector[4];
 
-    char *text = "Create a context instance (nrf_crypto_rng_context_t) that is valid for as long as the RNG is in use and optionally create a temporary buffer (nrf_crypto_rng_temp_buffer_t) that is only needed during initialization.  Initialize the RNG using nrf_crypto_rng_init after a call to nrf_crypto_init, providing a pointer to the context and a temporary buffer. Create a context instance (nrf_crypto_rng_context_t) that is valid for as long as the RNG is in use and optionally create a temporary buffer (nrf_crypto_rng_temp_buffer_t) that is only needed during initialization.  Initialize the RNG using nrf_crypto_rng_init after a call to nrf_crypto_init, providing a pointer to the context and a temporary buffer.";
+    char *text = "test\ntest\n";
 
     nrf_drv_rng_rand(random_vector, 4);
 
@@ -209,8 +209,8 @@ static void fatfs_file_create(void)
     }
 
     f_write(&file,text,strlen(text),&bw);
-
     ff_result = f_close(&file);
+
     if (ff_result != FR_OK)
     {
         SEGGER_RTT_printf(0,"\r\nUnable to close file: %u", ff_result);
@@ -288,7 +288,9 @@ static void bsp_event_callback(bsp_event_t ev)
 void logger(void)
  {
 
-  if(m_prev_GPS_state != m_GPS_on)
+  if(!G_gpx_write_position) return;
+
+  if(m_prev_GPS_state != m_GPS_on) 
     {
      if(m_GPS_on)
       {
@@ -307,6 +309,7 @@ void logger(void)
         G_gpx_wrote_header = false;
         G_gpx_wrote_footer = true;
       }
+
      m_prev_GPS_state = m_GPS_on;
     }
 
@@ -317,14 +320,16 @@ void logger(void)
      nrf_gpio_pin_set(USER_LED_3);
      nrf_delay_us(500);
      nrf_gpio_pin_clear(USER_LED_3);
-     G_gpx_write_position = false;
-     
    }
+
+  SEGGER_RTT_printf(0,"logger: m_shock_val: %d\n",m_shock_val);
 
   m_shock_val = 0;
 
   if((G_current_position.n_satellites >= MIN_SATELLITES) && (G_pos_write_delay<5))
    G_pos_write_delay++;
+
+  G_gpx_write_position = false;
 
  }
 

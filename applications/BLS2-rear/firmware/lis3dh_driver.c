@@ -1860,13 +1860,13 @@ void LIS3DH_update_shock_val2(void *p_context)
  {
    AxesRaw_t acc;
    uint8_t FIFO_samples;
-   uint8_t sample_counter;
+   uint8_t sample_counter, response;
 
    if(m_GPS_on == false)
     return;
 
-   LIS3DH_GetFifoSourceFSS(&FIFO_samples);
-   SEGGER_RTT_printf(0,"FIFO samples: %d\n",FIFO_samples);
+   response = LIS3DH_GetFifoSourceFSS(&FIFO_samples);
+   SEGGER_RTT_printf(0,"FIFO samples: %d (%d)\n",FIFO_samples, response);
 
    for(sample_counter = 0; sample_counter < FIFO_samples; sample_counter++)
       {

@@ -2,11 +2,57 @@
 #include "touch.h"
 #include "mpr121.h"
 
-void blink_led(uint16_t GPIO)
+void blink_led(uint16_t GPIO,uint8_t times)
  {
-   nrf_gpio_pin_set(GPIO);
-   nrf_delay_ms(100);
-   nrf_gpio_pin_clear(GPIO);
+   uint8_t i;
+
+   for(i=0;i<=times;i++)
+    {
+     nrf_gpio_pin_set(GPIO);
+     nrf_delay_ms(100);
+     nrf_gpio_pin_clear(GPIO);
+    }
+ }
+
+void show_battery_level(void)
+ {
+   uint8_t battery_level = m_battery_level - 123; // this should yield around 115 max (battery fully loaded), and around 0 min (battery empty)
+
+   blink_led(USER_LED_1,1);
+   blink_led(USER_LED_2,1);
+   blink_led(USER_LED_3,1);
+
+   if(battery_level < 20)
+     blink_led(USER_LED_3,15);
+   else if((battery_level >= 20) && (battery_level < 40))
+     {
+      nrf_gpio_pin_set(USER_LED_3);
+      blink_led(USER_LED_2,15);
+     }
+   else if((battery_level >= 40) && (battery_level < 60))
+     {
+      nrf_gpio_pin_set(USER_LED_3);
+      nrf_gpio_pin_set(USER_LED_2);
+      nrf_delay_ms(1500);
+     }
+   else if((battery_level >= 60) && (battery_level < 80))
+     {
+      nrf_gpio_pin_set(USER_LED_3);
+      nrf_gpio_pin_set(USER_LED_2);
+      blink_led(USER_LED_1,15);
+     }
+   else if(battery_level >= 80)
+     {
+      nrf_gpio_pin_set(USER_LED_3);
+      nrf_gpio_pin_set(USER_LED_2);
+      nrf_gpio_pin_set(USER_LED_1);
+      nrf_delay_ms(1500);
+     }
+
+    nrf_gpio_pin_clear(USER_LED_3);
+    nrf_gpio_pin_clear(USER_LED_2);
+    nrf_gpio_pin_clear(USER_LED_1);
+
  }
 
 void touch_event_timer_handler(void *p_context)
@@ -59,7 +105,7 @@ void touch_event_timer_handler(void *p_context)
    {
      case T_L:
       SEGGER_RTT_printf(0, "touch event: T_L\n");
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_M:
@@ -69,17 +115,17 @@ void touch_event_timer_handler(void *p_context)
         m_headlight_duty_cycle -= 20;
         pwm_update_duty_cycle(m_headlight_duty_cycle);
        }
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_R:
       SEGGER_RTT_printf(0, "touch event: T_R\n");
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_L_DT:
       SEGGER_RTT_printf(0, "touch event: T_L_DT\n");
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_M_DT:
@@ -89,7 +135,7 @@ void touch_event_timer_handler(void *p_context)
         m_headlight_duty_cycle += 20;
         pwm_update_duty_cycle(m_headlight_duty_cycle);
        }
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_M_TT:
@@ -101,7 +147,7 @@ void touch_event_timer_handler(void *p_context)
         else 
          switch_light_mode(LIGHT_CONSTANT);
        }
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_R_DT:
@@ -110,12 +156,12 @@ void touch_event_timer_handler(void *p_context)
         light_start();
       else
         light_stop();
-      blink_led(USER_LED_2);
+      blink_led(USER_LED_2,1);
       break;
 
      case T_R_TT:
       SEGGER_RTT_printf(0, "touch event: T_R_TT\n");
-      blink_led(USER_LED_2);
+      show_battery_level();
       break;
 
    }
