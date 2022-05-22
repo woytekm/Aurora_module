@@ -18,6 +18,12 @@ GPX data can be then extracted and converted to data points using script located
 
 Interesting OpenLayers API routine allowing to colorize tracks using custom data contained in GPX: http://viglino.github.io/ol-ext/examples/style/map.style.gpxline.html
 
+Example road quality track prepared in GPS Visualizer ( https://www.gpsvisualizer.com/ )
+
+<p align="center">
+<img src="https://github.com/woytekm/Aurora_module/blob/main/applications/BLS2-rear/example_road_quality_track.png" width="800" height="600">
+</p>
+
 <p align="center">
 <img src="https://github.com/woytekm/Aurora_module/blob/main/applications/BLS2-rear/bls2-rear.png" width="800" height="345">
 </p>
