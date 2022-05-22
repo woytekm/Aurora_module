@@ -130,6 +130,8 @@ void touch_event_timer_handler(void *p_context)
       if(!m_GPS_on)
        {
          GPS_enable();
+         SEGGER_RTT_printf(0, "GPS logger on\n");
+         m_GPS_logger_active = true;
          nrf_delay_ms(100);
 #ifdef USE_MPR121
          nrf_delay_ms(3000);
@@ -141,7 +143,10 @@ void touch_event_timer_handler(void *p_context)
        {
         GPS_disable();
         nrf_delay_us(5000);
+        SEGGER_RTT_printf(0, "GPS logger off\n");
+        m_GPS_logger_active = false;
        }
+
       blink_led(USER_LED_2,1);
       break;
 

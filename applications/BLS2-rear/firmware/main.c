@@ -288,8 +288,6 @@ static void bsp_event_callback(bsp_event_t ev)
 void logger(void)
  {
 
-  if(!G_gpx_write_position) return;
-
   if(m_prev_GPS_state != m_GPS_on) 
     {
      if(m_GPS_on)
@@ -312,6 +310,7 @@ void logger(void)
 
      m_prev_GPS_state = m_GPS_on;
     }
+  if(!G_gpx_write_position) return;
 
   if(((m_GPS_on&&G_gpx_wrote_header) && (G_current_position.n_satellites >= MIN_SATELLITES) && G_gpx_write_position) && (G_pos_write_delay==5) && (G_current_position.HDOP < MIN_V_HDOP))
    {
@@ -460,7 +459,7 @@ int main(void)
 
  fatfs_init();
  fatfs_ls();
- //LIS3DH_test();
+// LIS3DH_test();
  LIS3DH_init();
 
  for (;;)

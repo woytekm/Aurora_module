@@ -1258,7 +1258,7 @@ status_t LIS3DH_FIFOModeEnable(LIS3DH_FifoMode_t fm) {
     
     value &= 0x1f;
     value |= (fm<<LIS3DH_FM);                      //fifo mode configuration
-    
+
     if( !LIS3DH_WriteReg(LIS3DH_FIFO_CTRL_REG, value) )
       return MEMS_ERROR;
   }
@@ -1766,16 +1766,17 @@ void LIS3DH_test(void)
    uint8_t sample_counter;
 
    response = LIS3DH_SetODR(LIS3DH_ODR_50Hz);
-
    response = LIS3DH_SetMode(LIS3DH_NORMAL);
-
    response = LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
-
    LIS3DH_SetBDU(MEMS_ENABLE);
-
    response = LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
 
-   response = LIS3DH_FIFOModeEnable(LIS3DH_FIFO_MODE);
+#ifdef LIS3DSH
+   LIS3DH_FIFOModeEnable(LIS3DH_FIFO_MODE);
+#endif
+#ifdef LIS3DH
+   LIS3DH_FIFOModeEnable(LIS3DH_FIFO_STREAM_MODE);
+#endif
 
    LIS3DH_GetAccAxesRaw(&acc);
 
@@ -1790,6 +1791,10 @@ void LIS3DH_test(void)
 
      response = LIS3DH_GetFifoSourceFSS(&FIFO_samples);
      SEGGER_RTT_printf(0,"FIFO samples: %d (%d)\n",FIFO_samples,response);
+
+     response = 0;
+
+     response = LIS3DH_GetAccAxesRaw(&acc);
 
      for(sample_counter = 0; sample_counter < FIFO_samples; sample_counter++)
       {
@@ -1825,6 +1830,7 @@ void LIS3DH_test(void)
         Y_prev = acc.AXIS_Y;
         Z_prev = acc.AXIS_Z;
       }
+
      if((X_factor||Y_factor||Z_factor)>0)
        SEGGER_RTT_printf(0,"X:%d, Y:%d, Z:%d\n",X_factor,Y_factor,Z_factor);
      
@@ -1922,7 +1928,16 @@ void LIS3DH_init(void)
    LIS3DH_SetFullScale(LIS3DH_FULLSCALE_2);
    LIS3DH_SetBDU(MEMS_ENABLE);
    LIS3DH_SetAxis(LIS3DH_X_ENABLE | LIS3DH_Y_ENABLE | LIS3DH_Z_ENABLE);
+
+// LIS3DH prefers FIFO_STREAM, LIS3DSH prefers FIFO mode
+
+#ifdef LIS3DSH
    LIS3DH_FIFOModeEnable(LIS3DH_FIFO_MODE);
+#endif
+#ifdef LIS3DH
+   LIS3DH_FIFOModeEnable(LIS3DH_FIFO_STREAM_MODE);
+#endif
+
    nrf_delay_ms(500);
    LIS3DH_GetAccAxesRaw(&acc);
 

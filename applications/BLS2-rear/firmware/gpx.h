@@ -32,6 +32,6 @@ typedef struct {
 bool gpx_write_header(char *filename, char *track_name);
 bool gpx_write_footer(char *filename);
 bool gpx_append_position_with_shock(nmea_gpgga_t *position, uint16_t shock_val, char *filename);
-void gpx_writer_handler(void *p_context);
+void GPS_logger_handler(void *p_context);
 
 #endif 

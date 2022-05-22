@@ -90,7 +90,7 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;
 app_timer_t *m_button_debounce_timer;
-app_timer_t *m_gpx_writer_timer;
+app_timer_t *m_gps_logger_timer;
 app_timer_t *m_shock_update_timer;
 app_timer_t *m_led_timer;
 
@@ -154,6 +154,7 @@ typedef struct GPS_settings{
  } GPS_settings_t;
 
 
+bool m_GPS_logger_active;
 bool m_GPS_on;
 bool m_track_on;
 bool m_track_pause;

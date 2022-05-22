@@ -1,14 +1,13 @@
 #include "global.h"
 
 
-void gpx_writer_handler(void *p_context)
+void GPS_logger_handler(void *p_context)
  {
-  if(m_GPS_on)
+  if(m_GPS_logger_active)
    {
-    SEGGER_RTT_printf(0,"gpx_writer_handler called.\n");
+    SEGGER_RTT_printf(0,"GPS_logger_handler called.\n");
     G_gpx_write_position = true;
    }
-  
  }
 
 
