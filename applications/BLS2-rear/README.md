@@ -10,7 +10,9 @@ This data can then be aggregated and visualized as a map of road surface quality
 
 Aurora onboard flash is accessible through USB, and can be mounted read-only on USB host.
 OS X command: 
-		sudo diskutil mount readOnly /dev/disk4s1
+```
+	sudo diskutil mount readOnly /dev/disk4s1
+```
 
 GPX data can be then extracted and converted to data points using script located in Aurora_module/applications/BLS2-rear/pothole directory.
 
