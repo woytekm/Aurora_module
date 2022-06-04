@@ -59,6 +59,7 @@ char * strsep (char **stringp, const char *delim)
 double deg2rad(double deg) {
   return (deg * pi / 180);
 }
+
 double rad2deg(double rad) {
   return (rad * 180 / pi);
 }
@@ -150,13 +151,13 @@ nmea_time_parse(char *s, struct tm *time)
   time->tm_mon = G_GPS_month;
   time->tm_mday = G_GPS_day;
 
-  
-
   return 0;
 }
 
 int nmea_date_parse(char *s)
  {
+
+   //SEGGER_RTT_printf(0,"nmea_date_parse: input string: %s\n",s);
 
    char day[3];
    char month[3];
@@ -173,6 +174,8 @@ int nmea_date_parse(char *s)
   G_GPS_day = atoi(day);
   G_GPS_month = atoi(month);
   G_GPS_year = atoi(year);
+
+  //SEGGER_RTT_printf(0,"nmea_date_parse: integers converted: %d, %d, %d\n",G_GPS_day,G_GPS_month,G_GPS_year);
 
   return 0;
  }
@@ -230,7 +233,7 @@ void GPS_parse_GPGGA(char *GPGGA_msg)
                                                                                   );
      SEGGER_RTT_printf(0,debug);
 #endif
-     if((!G_time_synced) && (G_fixes > 10))  // sync time after 5 good GPS fixes
+     if(G_fixes > 10)  // sync time after 5 good GPS fixes
       {
         sync_system_time_to_GPS();
         sync_system_date_to_GPS();

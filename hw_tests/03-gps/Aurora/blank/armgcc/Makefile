@@ -2,7 +2,7 @@ PROJECT_NAME     := blinky_pca10040
 TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := _build
 
-SDK_ROOT := /Users/wojtek/Documents/code/nRF52/nRF5SDK160098a08e2/
+SDK_ROOT := /Users/wojtek/Documents/code/nRF52/nRF5_SDK_17.0.2_d674dde/
 PROJ_DIR := ../../..
 
 $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \

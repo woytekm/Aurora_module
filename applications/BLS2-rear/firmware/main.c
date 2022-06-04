@@ -287,6 +287,8 @@ static void bsp_event_callback(bsp_event_t ev)
 
 void logger(void)
  {
+ 
+  FRESULT err_code;
 
   if(m_prev_GPS_state != m_GPS_on) 
     {
@@ -299,11 +301,11 @@ void logger(void)
       }
      else
       {
-        sprintf(G_current_gpx_filename,"%02d%02d.gpx",G_system_time.tm_hour,G_system_time.tm_min);
+        sprintf(G_current_gpx_filename,"%02d%02d%02d%02d.gpx",G_system_time.tm_mon,G_system_time.tm_mday,G_system_time.tm_hour,G_system_time.tm_min);
         gpx_write_footer(TRACK_FNAME);
-        f_rename(TRACK_FNAME,G_current_gpx_filename);
+        err_code = f_rename(TRACK_FNAME,G_current_gpx_filename);
 
-        SEGGER_RTT_printf(0,"GPX file closed.\n");
+        SEGGER_RTT_printf(0,"GPX file renamed to %s (%d).\n",G_current_gpx_filename,err_code);
         G_gpx_wrote_header = false;
         G_gpx_wrote_footer = true;
       }

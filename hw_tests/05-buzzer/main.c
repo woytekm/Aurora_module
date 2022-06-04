@@ -105,30 +105,35 @@ int main(void)
 //nrf_drv_gpiote_in_event_enable(BUTTON0, true);
 
 //}
-uint16_t i = 0;
+uint16_t i,j = 0;
+
 
 while(1)
- {
+{
+ while(j<5)
+  {
 
-    while(i<2000)
-    {
-    //nrf_gpio_pin_set(BUZZER);     
-    nrf_gpio_pin_write(BUZZER, 1);
-    nrf_delay_us(60);
-    //nrf_gpio_pin_clear(BUZZER);
-    nrf_gpio_pin_write(BUZZER, 0);
-    nrf_delay_us(60);
-    i++;
-    }
-   
-    i = 0;
+     while(i<1000)
+      {
+       //nrf_gpio_pin_set(BUZZER);     
+       nrf_gpio_pin_write(BUZZER, 1);
+       nrf_delay_us(200);
+       //nrf_gpio_pin_clear(BUZZER);
+       nrf_gpio_pin_write(BUZZER, 0);
+       nrf_delay_us(200);
+       i++;
+      }
+     i = 0;
 
-    nrf_delay_us(80000);
-
-//  while(!blink)
-//   {}
-
+     nrf_delay_us(80000);
+     j++;
   }
+
+  j = 0;
+  nrf_delay_ms(1000);
+
+}
+
 
 }
 
