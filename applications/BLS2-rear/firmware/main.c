@@ -314,13 +314,15 @@ void logger(void)
     }
   if(!G_gpx_write_position) return;
 
-  if(((m_GPS_on&&G_gpx_wrote_header) && (G_current_position.n_satellites >= MIN_SATELLITES) && G_gpx_write_position) && (G_pos_write_delay==5) && (G_current_position.HDOP < MIN_V_HDOP))
+  if(((m_GPS_on&&G_gpx_wrote_header) && (G_current_position.n_satellites >= MIN_SATELLITES) && G_gpx_write_position) && (G_pos_write_delay==5) && (G_current_position.HDOP < MIN_V_HDOP) && 
+     // Do not write position if long/lat degrees are zero. This happens from time to time, when module is momentarily losing fix. 
+     ((G_current_position.m_longitude.degrees != 0) && (G_current_position.m_latitude.degrees != 0)) )   
    {
-     SEGGER_RTT_printf(0,"gpx_write_header: position appended.\n");
      gpx_append_position_with_shock(&G_current_position, m_shock_val, TRACK_FNAME);
      nrf_gpio_pin_set(USER_LED_3);
      nrf_delay_us(500);
      nrf_gpio_pin_clear(USER_LED_3);
+     SEGGER_RTT_printf(0,"gpx_write_header: position appended.\n");
    }
 
   SEGGER_RTT_printf(0,"logger: m_shock_val: %d\n",m_shock_val);
