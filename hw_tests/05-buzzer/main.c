@@ -362,7 +362,6 @@ int main(void)
  nrf_gpio_cfg_output(BUZZER);
 
  SEGGER_RTT_printf(0, "app start segger.\n");
- SEGGER_RTT_printf(0, "\n%d\n",sizeof(scale));
 
  while(1)
  {

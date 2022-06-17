@@ -170,6 +170,7 @@ void touch_event_timer_handler(void *p_context)
         else m_led_program++;
         light_stop();
         light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+        save_state(m_led_program);
        }
       blink_led(USER_LED_2,1);
       break;
@@ -177,9 +178,15 @@ void touch_event_timer_handler(void *p_context)
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
       if(!m_light_on)
+       {
         light_start(m_led_program,m_led_program_speed,m_led_program_brightness);
+        save_state(m_led_program);
+       }
       else
+       {
         light_stop();
+        save_state(0);
+       }
       blink_led(USER_LED_2,1);
       break;
 

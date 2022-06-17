@@ -61,6 +61,16 @@
 #include "nrf_block_dev_qspi.h"
 #include "nrf_drv_usbd.h"
 
+#include "nrf_fstorage.h"
+
+#ifdef SOFTDEVICE_PRESENT
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_fstorage_sd.h"
+#else
+#include "nrf_drv_clock.h"
+#include "nrf_fstorage_nvmc.h"
+#endif
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
@@ -170,6 +180,10 @@ uint16_t m_shock_val;
 int16_t m_X_prev,m_Y_prev,m_Z_prev;
 int16_t m_X_factor,m_Y_factor,m_Z_factor;
 
+nrf_fstorage_api_t * p_fs_api;
+
+enum LIGHT_STATE { STOP, PGM1, PGM2, PGM3, PGM4, PGM5 };
+
 // prototypes
 
 void MPR121_check_pad_status(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action);
@@ -201,5 +215,10 @@ void UART_config( uint8_t rts_pin_number,
                           bool hwfc);
 
 void parse_GPS_input(char *input_string);
+
+uint8_t read_state(void);
+void save_state(uint8_t state);
+
+static void fatfs_mkfs(void);
    
 #endif
