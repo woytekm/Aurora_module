@@ -47,6 +47,16 @@
 #include "app_error.h"
 #include "app_timer.h"
 
+#include "nrf_fstorage.h"
+
+#ifdef SOFTDEVICE_PRESENT
+#include "nrf_sdh.h"
+#include "nrf_sdh_ble.h"
+#include "nrf_fstorage_sd.h"
+#else
+#include "nrf_drv_clock.h"
+#include "nrf_fstorage_nvmc.h"
+#endif
 
 /* TWI instance ID. */
 #define TWI_INSTANCE_ID_0     0
@@ -68,6 +78,8 @@ static const nrf_drv_twi_t m_twi_1 = NRF_DRV_TWI_INSTANCE(TWI_INSTANCE_ID_1);
 #define USER_LED_1 NRF_GPIO_PIN_MAP(1,13)
 
 #define ALERT_BATT_LEVEL 30
+
+nrf_fstorage_api_t * p_fs_api;
 
 app_timer_t *m_touch_event_timer;
 app_timer_t *m_touch_reset_timer;
@@ -99,7 +111,7 @@ bool led_2_blink;
 bool led_3_blink;
 uint8_t m_blink_delay;
 
-enum LIGHT_MODE { LIGHT_CONSTANT, LIGHT_FLASHING };
+enum LIGHT_MODE { LIGHT_OFF, LIGHT_CONSTANT, LIGHT_FLASHING };
 
 uint8_t m_headlight_duty_cycle;
 uint8_t m_light_mode;
@@ -125,5 +137,8 @@ void pwm_init(void);
 void pwm_update_duty_cycle(uint8_t duty_cycle);
 void switch_light_mode(uint8_t light_mode);
 void headlight_flash_handler(void *p_context);
+
+uint8_t read_state(void);
+void save_state(uint8_t state);
 
 #endif

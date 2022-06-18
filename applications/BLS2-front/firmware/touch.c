@@ -143,19 +143,33 @@ void touch_event_timer_handler(void *p_context)
       if(m_light_on)
        {
         if(m_light_mode == LIGHT_CONSTANT)
-         switch_light_mode(LIGHT_FLASHING);
+         {
+          switch_light_mode(LIGHT_FLASHING);
+          save_state(LIGHT_FLASHING);
+         }
         else 
-         switch_light_mode(LIGHT_CONSTANT);
+         {
+           switch_light_mode(LIGHT_CONSTANT);
+           save_state(LIGHT_CONSTANT);
+         }
        }
       blink_led(USER_LED_2,1);
       break;
 
      case T_R_DT:
       SEGGER_RTT_printf(0, "touch event: T_R_DT\n");
+
       if(!m_light_on)
-        light_start();
+        {
+          light_start();
+          save_state(m_light_mode);
+        }
       else
-        light_stop();
+        {
+          light_stop();
+          save_state(LIGHT_OFF);
+        }
+
       blink_led(USER_LED_2,1);
       break;
 
